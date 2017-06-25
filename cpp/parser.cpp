@@ -77,7 +77,7 @@ bool  XMLParser::parse_attributes() {
   const char* s = buff;
   int last_i = 0;
   bool do_break = false;
-  /** unused:  std::string attr_name = ""   **/ ;
+  /** unused:  std::string attr_name = std::string("")   **/ ;
   int sp = i;
   int ep = i;
   char c = 0;

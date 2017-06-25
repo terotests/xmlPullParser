@@ -87,7 +87,7 @@ bool  XMLParser::parse_attributes() {
   const char* s = buff;
   int last_i = 0;
   bool do_break = false;
-  /** unused:  std::string attr_name = ""   **/ ;
+  /** unused:  std::string attr_name = std::string("")   **/ ;
   int sp = i;
   int ep = i;
   char c = 0;
@@ -294,40 +294,40 @@ tester::tester( ) {
 }
 
 int main(int argc, char* argv[]) {
-  std::cout << "Testing XML parser" << std::endl;
-  std::string read_code = "<div>\r\n                hello World <span/>\r\n                <span/>\r\n                <ul style=\"color:green;\">\r\n                    <li>Ferrari <span>F50</span></li>\r\n                    <li>Ford</li>\r\n                </ul></div>";
+  std::cout << std::string("Testing XML parser") << std::endl;
+  std::string read_code = std::string("<div>\r\n                hello World <span/>\r\n                <span/>\r\n                <ul style=\"color:green;\">\r\n                    <li>Ferrari <span>F50</span></li>\r\n                    <li>Ford</li>\r\n                </ul></div>");
   std::shared_ptr<SourceCode> the_code =  std::make_shared<SourceCode>(read_code);
   std::shared_ptr<XMLParser> p =  std::make_shared<XMLParser>(the_code);
   std::clock_t __begin = std::clock();
   while (p->pull()) {
     std::shared_ptr<XMLNode> last = p->last();
-    std::cout << "-> pulled a new node " + last->vref << std::endl;
+    std::cout << std::string("-> pulled a new node ") + last->vref << std::endl;
     std::shared_ptr<XMLNode> last_11 = p->last_finished;
     for ( std::vector< std::shared_ptr<XMLNode>>::size_type i = 0; i != last_11->children.size(); i++) {
       std::shared_ptr<XMLNode> ch = last_11->children.at(i);
       if ( ch->value_type == 18 ) {
-        std::cout << "text : " + ch->string_value << std::endl;
+        std::cout << std::string("text : ") + ch->string_value << std::endl;
       } else {
-        std::cout << "child : " + ch->vref << std::endl;
+        std::cout << std::string("child : ") + ch->vref << std::endl;
       }
     }
     for ( std::vector< std::shared_ptr<XMLNode>>::size_type i_10 = 0; i_10 != last_11->attrs.size(); i_10++) {
       std::shared_ptr<XMLNode> attr = last_11->attrs.at(i_10);
-      std::cout << (attr->vref + " = ") + attr->string_value << std::endl;
+      std::cout << (attr->vref + std::string(" = ")) + attr->string_value << std::endl;
     }
   }
   std::shared_ptr<XMLNode> last_12 = p->last();
-  std::cout << "The children of the last node are " + last_12->vref << std::endl;
+  std::cout << std::string("The children of the last node are ") + last_12->vref << std::endl;
   for ( std::vector< std::shared_ptr<XMLNode>>::size_type i_12 = 0; i_12 != last_12->children.size(); i_12++) {
     std::shared_ptr<XMLNode> ch_8 = last_12->children.at(i_12);
     if ( ch_8->value_type == 18 ) {
-      std::cout << "text : " + ch_8->string_value << std::endl;
+      std::cout << std::string("text : ") + ch_8->string_value << std::endl;
     } else {
-      std::cout << "child : " + ch_8->vref << std::endl;
+      std::cout << std::string("child : ") + ch_8->vref << std::endl;
     }
   }
   std::clock_t __end = std::clock();
-  std::cout << "Time for parsing the code:" << ( double(__end - __begin) / CLOCKS_PER_SEC ) << std::endl;
-  std::cout << "--- done --- " << std::endl;
+  std::cout << std::string("Time for parsing the code:") << ( double(__end - __begin) / CLOCKS_PER_SEC ) << std::endl;
+  std::cout << std::string("--- done --- ") << std::endl;
   return 0;
 }
