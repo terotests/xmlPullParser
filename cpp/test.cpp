@@ -299,7 +299,8 @@ int main(int argc, char* argv[]) {
   std::shared_ptr<SourceCode> the_code =  std::make_shared<SourceCode>(read_code);
   std::shared_ptr<XMLParser> p =  std::make_shared<XMLParser>(the_code);
   std::clock_t __begin = std::clock();
-  while (p->pull()) {std::shared_ptr<XMLNode> last = p->last();
+  while (p->pull()) {
+    std::shared_ptr<XMLNode> last = p->last();
     std::cout << "-> pulled a new node " + last->vref << std::endl;
     std::shared_ptr<XMLNode> last_11 = p->last_finished;
     for ( std::vector< std::shared_ptr<XMLNode>>::size_type i = 0; i != last_11->children.size(); i++) {

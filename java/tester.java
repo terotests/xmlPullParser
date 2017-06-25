@@ -9,7 +9,8 @@ class tester {
     final SourceCode the_code = new SourceCode(read_code);
     final XMLParser p = new XMLParser(the_code);
     long startTime = System.nanoTime();
-    while (p.pull()) {final XMLNode last = p.last();
+    while (p.pull()) {
+      final XMLNode last = p.last();
       System.out.println(String.valueOf( "-> pulled a new node " + last.vref ) );
       final XMLNode last_11 = p.last_finished.get();
       for ( int i = 0; i < last_11.children.size(); i++) {

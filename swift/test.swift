@@ -258,7 +258,8 @@ let the_code : SourceCode = SourceCode(code_str : read_code)
 let p : XMLParser = XMLParser(code_module : the_code)
 do {
   let _start = CFAbsoluteTimeGetCurrent()
-  while (p.pull()) {let last : XMLNode = p.last()
+  while (p.pull()) {
+    let last : XMLNode = p.last()
     print("-> pulled a new node " + last.vref)
     let last_11 : XMLNode = p.last_finished!
     for ( _ , ch ) in last_11.children.enumerated() {

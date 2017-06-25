@@ -761,7 +761,7 @@ func r_io_read_file( path string , fileName string ) *GoNullable {
 
         while           cmdWhile:void          ( condition:boolean whileLoop:block )  {
             templates {
-                go ( "for " (e 1) " {" I (block 2) i "}" )
+                go ( "for " (e 1) " {" I nl (block 2) nl i "}" )
                 scala ( 
                     (forkctx _ ) (def 2) (def 3) 
                     "try {" nl I
@@ -780,7 +780,7 @@ func r_io_read_file( path string , fileName string ) *GoNullable {
                     i nl "} " nl
                     (imp "scala.util.control._")
                 )                 
-                * ( "while (" (e 1) ") {" I (block 2) i "}" )
+                * ( "while (" (e 1) ") {" nl I (block 2) i nl "}" )
             }
         }
 

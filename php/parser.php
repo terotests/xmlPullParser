@@ -294,7 +294,8 @@ $read_code = "<div>\r\n                hello World <span/>\r\n                <s
 $the_code =  new SourceCode($read_code);
 $p =  new XMLParser($the_code);
 $time_start = microtime(true);
-while ($p->pull()) {$last = $p->last();
+while ($p->pull()) {
+  $last = $p->last();
   echo( "-> pulled a new node " . $last->vref . "\n");
   $last_11 = $p->last_finished;
   for ( $i = 0; $i < count($last_11->children); $i++) {

@@ -269,7 +269,8 @@ var read_code = "<div>\r\n                hello World <span/>\r\n               
 var the_code = new SourceCode(read_code)
 var p = new XMLParser(the_code)
 console.time("Time for parsing the code:");
-while (p.pull()) {var last = p.last()
+while (p.pull()) {
+  var last = p.last()
   console.log("-> pulled a new node " + last.vref)
   var last_11 = p.last_finished
   for ( var i = 0; i < last_11.children.length; i++) {

@@ -574,7 +574,8 @@ func main() {
   var p *XMLParser = CreateNew_XMLParser(the_code);
   for {
     _start := time.Now()
-    for p.pull() {var last *XMLNode = p.last();
+    for p.pull() {
+      var last *XMLNode = p.last();
       fmt.Println( strings.Join([]string{ "-> pulled a new node ",last.vref }, "") )
       var last_11 *XMLNode = p.last_finished.value.(*XMLNode);
       var i int64 = 0;  
