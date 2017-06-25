@@ -1,8 +1,5 @@
 package main
 import (
-  "fmt"
-  "strings"
-  "strconv"
 )
 
 type GoNullable struct { 
@@ -90,7 +87,6 @@ type IFACE_XMLNode interface {
   Get_parent() *GoNullable
   Set_parent(value *GoNullable) 
   getString() string
-  walk() ()
 }
 
 func CreateNew_XMLNode(source *SourceCode, start int64, end int64) *XMLNode {
@@ -113,19 +109,6 @@ func CreateNew_XMLNode(source *SourceCode, start int64, end int64) *XMLNode {
 }
 func (this *XMLNode) getString () string {
   return this.code.value.(*SourceCode).code[this.sp:this.ep];
-}
-func (this *XMLNode) walk () () {
-  fmt.Println( this.vref )
-  var idx int64 = 0;  
-  for ; idx < int64(len(this.attrs)) ; idx++ {
-    attr := this.attrs[idx];
-    fmt.Println( strings.Join([]string{ (strings.Join([]string{ (strings.Join([]string{ (strings.Join([]string{ (strings.Join([]string{ "attr[",strconv.FormatInt(idx, 10) }, "")),"] " }, "")),attr.vref }, ""))," = " }, "")),attr.string_value }, "") )
-  }
-  var i int64 = 0;  
-  for ; i < int64(len(this.children)) ; i++ {
-    item := this.children[i];
-    item.walk();
-  }
 }
 // getter for variable code
 func (this *XMLNode) Get_code() *GoNullable {

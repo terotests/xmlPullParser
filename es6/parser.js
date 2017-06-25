@@ -29,18 +29,6 @@ class XMLNode  {
   getString() {
     return this.code.code.substring(this.sp, this.ep );
   }
-  
-  walk() {
-    console.log(this.vref)
-    for ( var idx = 0; idx < this.attrs.length; idx++) {
-      var attr = this.attrs[idx];
-      console.log((((("attr[" + idx) + "] ") + attr.vref) + " = ") + attr.string_value)
-    }
-    for ( var i = 0; i < this.children.length; i++) {
-      var item = this.children[i];
-      item.walk();
-    }
-  }
 }
 class XMLParser  {
   

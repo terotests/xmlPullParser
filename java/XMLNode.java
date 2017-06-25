@@ -1,6 +1,5 @@
 import java.util.Optional;
 import java.util.*;
-import java.io.*;
 
 class XMLNode { 
   public Optional<SourceCode> code = Optional.empty();
@@ -22,17 +21,5 @@ class XMLNode {
   
   public String getString() {
     return code.get().code.substring(sp, ep );
-  }
-  
-  public void walk() {
-    System.out.println(String.valueOf( vref ) );
-    for ( int idx = 0; idx < attrs.size(); idx++) {
-      XMLNode attr = attrs.get(idx);
-      System.out.println(String.valueOf( (((("attr[" + idx) + "] ") + attr.vref) + " = ") + attr.string_value ) );
-    }
-    for ( int i = 0; i < children.size(); i++) {
-      XMLNode item = children.get(i);
-      item.walk();
-    }
   }
 }

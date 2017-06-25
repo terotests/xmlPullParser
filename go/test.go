@@ -2,7 +2,6 @@ package main
 import (
   "fmt"
   "strings"
-  "strconv"
   "time"
 )
 
@@ -91,7 +90,6 @@ type IFACE_XMLNode interface {
   Get_parent() *GoNullable
   Set_parent(value *GoNullable) 
   getString() string
-  walk() ()
 }
 
 func CreateNew_XMLNode(source *SourceCode, start int64, end int64) *XMLNode {
@@ -114,19 +112,6 @@ func CreateNew_XMLNode(source *SourceCode, start int64, end int64) *XMLNode {
 }
 func (this *XMLNode) getString () string {
   return this.code.value.(*SourceCode).code[this.sp:this.ep];
-}
-func (this *XMLNode) walk () () {
-  fmt.Println( this.vref )
-  var idx int64 = 0;  
-  for ; idx < int64(len(this.attrs)) ; idx++ {
-    attr := this.attrs[idx];
-    fmt.Println( strings.Join([]string{ (strings.Join([]string{ (strings.Join([]string{ (strings.Join([]string{ (strings.Join([]string{ "attr[",strconv.FormatInt(idx, 10) }, "")),"] " }, "")),attr.vref }, ""))," = " }, "")),attr.string_value }, "") )
-  }
-  var i int64 = 0;  
-  for ; i < int64(len(this.children)) ; i++ {
-    item := this.children[i];
-    item.walk();
-  }
 }
 // getter for variable code
 func (this *XMLNode) Get_code() *GoNullable {
@@ -592,26 +577,26 @@ func main() {
     for p.pull() {var last *XMLNode = p.last();
       fmt.Println( strings.Join([]string{ "-> pulled a new node ",last.vref }, "") )
       var last_11 *XMLNode = p.last_finished.value.(*XMLNode);
-      var i_2 int64 = 0;  
-      for ; i_2 < int64(len(last_11.children)) ; i_2++ {
-        ch := last_11.children[i_2];
+      var i int64 = 0;  
+      for ; i < int64(len(last_11.children)) ; i++ {
+        ch := last_11.children[i];
         if  ch.value_type == 18 {
           fmt.Println( strings.Join([]string{ "text : ",ch.string_value }, "") )
         } else {
           fmt.Println( strings.Join([]string{ "child : ",ch.vref }, "") )
         }
       }
-      var i_11 int64 = 0;  
-      for ; i_11 < int64(len(last_11.attrs)) ; i_11++ {
-        attr_2 := last_11.attrs[i_11];
-        fmt.Println( strings.Join([]string{ (strings.Join([]string{ attr_2.vref," = " }, "")),attr_2.string_value }, "") )
+      var i_10 int64 = 0;  
+      for ; i_10 < int64(len(last_11.attrs)) ; i_10++ {
+        attr := last_11.attrs[i_10];
+        fmt.Println( strings.Join([]string{ (strings.Join([]string{ attr.vref," = " }, "")),attr.string_value }, "") )
       }
     }
     var last_12 *XMLNode = p.last();
     fmt.Println( strings.Join([]string{ "The children of the last node are ",last_12.vref }, "") )
-    var i_13 int64 = 0;  
-    for ; i_13 < int64(len(last_12.children)) ; i_13++ {
-      ch_8 := last_12.children[i_13];
+    var i_12 int64 = 0;  
+    for ; i_12 < int64(len(last_12.children)) ; i_12++ {
+      ch_8 := last_12.children[i_12];
       if  ch_8.value_type == 18 {
         fmt.Println( strings.Join([]string{ "text : ",ch_8.string_value }, "") )
       } else {

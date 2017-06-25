@@ -27,15 +27,6 @@ class XMLNode {
   func getString() -> String {
     return code!.code[code!.code.index(code!.code.startIndex, offsetBy:sp)..<code!.code.index(code!.code.startIndex, offsetBy:ep)];
   }
-  func walk() -> Void {
-    print(vref)
-    for ( idx , attr ) in attrs.enumerated() {
-      print((((("attr[" + String(idx)) + "] ") + attr.vref) + " = ") + attr.string_value)
-    }
-    for ( _ , item ) in children.enumerated() {
-      item.walk()
-    }
-  }
 }
 class XMLParser { 
   var code : SourceCode?
@@ -277,8 +268,8 @@ do {
         print("child : " + ch.vref)
       }
     }
-    for ( _ , attr_2 ) in last_11.attrs.enumerated() {
-      print((attr_2.vref + " = ") + attr_2.string_value)
+    for ( _ , attr ) in last_11.attrs.enumerated() {
+      print((attr.vref + " = ") + attr.string_value)
     }
   }
   let last_12 : XMLNode = p.last()

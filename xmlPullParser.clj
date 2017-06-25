@@ -61,15 +61,6 @@ class XMLNode:void {
   fn getString:string () {
     return (substring code.code sp ep)
   }
-  fn walk:void () {
-    print vref
-    for attrs attr:XMLNode idx {
-      print ((((("attr[" + idx) + "] ") + attr.vref) + " = ") + attr.string_value)
-    }
-    for children item:XMLNode i {
-      item.walk()
-    }
-  }
 }
 class XMLParser:void {
   def code:SourceCode

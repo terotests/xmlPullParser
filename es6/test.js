@@ -29,18 +29,6 @@ class XMLNode  {
   getString() {
     return this.code.code.substring(this.sp, this.ep );
   }
-  
-  walk() {
-    console.log(this.vref)
-    for ( var idx = 0; idx < this.attrs.length; idx++) {
-      var attr = this.attrs[idx];
-      console.log((((("attr[" + idx) + "] ") + attr.vref) + " = ") + attr.string_value)
-    }
-    for ( var i = 0; i < this.children.length; i++) {
-      var item = this.children[i];
-      item.walk();
-    }
-  }
 }
 class XMLParser  {
   
@@ -284,23 +272,23 @@ console.time("Time for parsing the code:");
 while (p.pull()) {var last = p.last()
   console.log("-> pulled a new node " + last.vref)
   var last_11 = p.last_finished
-  for ( var i_2 = 0; i_2 < last_11.children.length; i_2++) {
-    var ch = last_11.children[i_2];
+  for ( var i = 0; i < last_11.children.length; i++) {
+    var ch = last_11.children[i];
     if ( ch.value_type == 18 ) {
       console.log("text : " + ch.string_value)
     } else {
       console.log("child : " + ch.vref)
     }
   }
-  for ( var i_11 = 0; i_11 < last_11.attrs.length; i_11++) {
-    var attr_2 = last_11.attrs[i_11];
-    console.log((attr_2.vref + " = ") + attr_2.string_value)
+  for ( var i_10 = 0; i_10 < last_11.attrs.length; i_10++) {
+    var attr = last_11.attrs[i_10];
+    console.log((attr.vref + " = ") + attr.string_value)
   }
 }
 var last_12 = p.last()
 console.log("The children of the last node are " + last_12.vref)
-for ( var i_13 = 0; i_13 < last_12.children.length; i_13++) {
-  var ch_8 = last_12.children[i_13];
+for ( var i_12 = 0; i_12 < last_12.children.length; i_12++) {
+  var ch_8 = last_12.children[i_12];
   if ( ch_8.value_type == 18 ) {
     console.log("text : " + ch_8.string_value)
   } else {

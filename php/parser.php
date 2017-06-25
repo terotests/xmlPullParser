@@ -43,18 +43,6 @@ class XMLNode {
   function getString() {
     return substr($this->code->code, $this->sp, $this->ep - $this->sp);
   }
-  
-  function walk() {
-    echo( $this->vref . "\n");
-    for ( $idx = 0; $idx < count($this->attrs); $idx++) {
-      $attr = $this->attrs[$idx];
-      echo( (((("attr[" . $idx) . "] ") . $attr->vref) . " = ") . $attr->string_value . "\n");
-    }
-    for ( $i = 0; $i < count($this->children); $i++) {
-      $item = $this->children[$i];
-      $item->walk();
-    }
-  }
 }
 class XMLParser { 
   var $code;
@@ -309,23 +297,23 @@ $time_start = microtime(true);
 while ($p->pull()) {$last = $p->last();
   echo( "-> pulled a new node " . $last->vref . "\n");
   $last_11 = $p->last_finished;
-  for ( $i_2 = 0; $i_2 < count($last_11->children); $i_2++) {
-    $ch = $last_11->children[$i_2];
+  for ( $i = 0; $i < count($last_11->children); $i++) {
+    $ch = $last_11->children[$i];
     if ( $ch->value_type == 18 ) {
       echo( "text : " . $ch->string_value . "\n");
     } else {
       echo( "child : " . $ch->vref . "\n");
     }
   }
-  for ( $i_11 = 0; $i_11 < count($last_11->attrs); $i_11++) {
-    $attr_2 = $last_11->attrs[$i_11];
-    echo( ($attr_2->vref . " = ") . $attr_2->string_value . "\n");
+  for ( $i_10 = 0; $i_10 < count($last_11->attrs); $i_10++) {
+    $attr = $last_11->attrs[$i_10];
+    echo( ($attr->vref . " = ") . $attr->string_value . "\n");
   }
 }
 $last_12 = $p->last();
 echo( "The children of the last node are " . $last_12->vref . "\n");
-for ( $i_13 = 0; $i_13 < count($last_12->children); $i_13++) {
-  $ch_8 = $last_12->children[$i_13];
+for ( $i_12 = 0; $i_12 < count($last_12->children); $i_12++) {
+  $ch_8 = $last_12->children[$i_12];
   if ( $ch_8->value_type == 18 ) {
     echo( "text : " . $ch_8->string_value . "\n");
   } else {
