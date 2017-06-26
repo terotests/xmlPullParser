@@ -134,28 +134,7 @@ class XMLParser:void {
 
   }
 
-  fn askMore:void (cb:XMLDataReady) {
-    this.onReady = cb
-    if (has_started == false) {
-      has_started = true
-      read (unwrap inStream) data:StreamChunk {
-        has_data = true
-        len = (length data)
-        buff = data
-        i = 0
-        if onReady {
-          this.askMore( (unwrap onReady) )        
-        }
-      } {
-        no_more_data = true
-        len = 0
-        i = 0
-        if onReady {
-          this.onReady.Finished( (unwrap last_finished) )     
-        }      
-      }
-      return
-    }
+  fn processData:void () {
     if no_more_data {
       if onReady {
         if last_finished {
@@ -176,7 +155,30 @@ class XMLParser:void {
           ask_more ( unwrap inStream )
         }
       }
+    }    
+  }
+
+  fn askMore:void (cb:XMLDataReady) {
+    this.onReady = cb
+    if (has_started == false) {
+      has_started = true
+      read (unwrap inStream) data:StreamChunk {
+        has_data = true
+        len = (length data)
+        buff = data
+        i = 0
+        this.processData()
+      } {
+        no_more_data = true
+        len = 0
+        i = 0
+        if onReady {
+          this.onReady.Finished( (unwrap last_finished) )     
+        }      
+      }
+      return
     } 
+    this.processData()
   }
 
   fn pull:boolean () {

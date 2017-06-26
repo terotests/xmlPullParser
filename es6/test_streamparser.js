@@ -136,30 +136,7 @@ class XMLParser  {
   getMoreData() {
   }
   
-  askMore(cb ) {
-    this.onReady = cb;
-    if ( this.has_started == false ) {
-      this.has_started = true;
-      this.inStream.on('data', (data) => {
-        this.inStream.pause()
-        this.has_data = true;
-        this.len = data.length;
-        this.buff = data;
-        this.i = 0;
-        if ( typeof(this.onReady) != "undefined" ) {
-          this.askMore(this.onReady);
-        }
-      });
-      this.inStream.on('end', () => {
-        this.no_more_data = true;
-        this.len = 0;
-        this.i = 0;
-        if ( typeof(this.onReady) != "undefined" ) {
-          this.onReady.Finished(this.last_finished);
-        }
-      });
-      return;
-    }
+  processData() {
     if ( this.no_more_data ) {
       if ( typeof(this.onReady) != "undefined" ) {
         if ( typeof(this.last_finished) != "undefined" ) {
@@ -181,6 +158,31 @@ class XMLParser  {
         }
       }
     }
+  }
+  
+  askMore(cb ) {
+    this.onReady = cb;
+    if ( this.has_started == false ) {
+      this.has_started = true;
+      this.inStream.on('data', (data) => {
+        this.inStream.pause()
+        this.has_data = true;
+        this.len = data.length;
+        this.buff = data;
+        this.i = 0;
+        this.processData();
+      });
+      this.inStream.on('end', () => {
+        this.no_more_data = true;
+        this.len = 0;
+        this.i = 0;
+        if ( typeof(this.onReady) != "undefined" ) {
+          this.onReady.Finished(this.last_finished);
+        }
+      });
+      return;
+    }
+    this.processData();
   }
   
   pull() {
