@@ -295,7 +295,7 @@ tester::tester( ) {
 
 int main(int argc, char* argv[]) {
   std::cout << std::string("Testing XML parser") << std::endl;
-  std::string read_code = std::string("<div>\r\n                hello World <span/>\r\n                <span/>\r\n                <ul style=\"color:green;\">\r\n                    <li>Ferrari <span>F50</span></li>\r\n                    <li>Ford</li>\r\n                </ul></div>");
+  std::string read_code = std::string("<View padding=\"2px\" margin=\"3px\" background-color=\"#fef6f2\" >\r\n    <View width=\"100%\" padding=\"10px\" id=\"stats1\" >\r\n        <View padding=\"20px\" width=\"dss\" >\r\n        Some text here...\r\n        </View>\r\n        <View padding=\"20px\" width=\"dss\" >\r\n        Some text here...\r\n        </View>\r\n\r\n        <View padding=\"20px\" width=\"dss\" >\r\n        Some text here...\r\n        </View>    </View>\r\n\r\n        <View padding=\"20px\" width=\"dss\" >\r\n        Some text here...\r\n        </View>\r\n</View></View>");
   std::shared_ptr<SourceCode> the_code =  std::make_shared<SourceCode>(read_code);
   std::shared_ptr<XMLParser> p =  std::make_shared<XMLParser>(the_code);
   std::clock_t __begin = std::clock();

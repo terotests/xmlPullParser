@@ -1,19 +1,27 @@
 
-class SourceCode  {
+class File  {
   
-  constructor(code_str  ) {
-    this.code = "";
-    this.sp = 0;     /** note: unused */
-    this.ep = 0;     /** note: unused */
-    this.code = code_str;
+  constructor(fName  ) {
+    this.filename = "";
+    this.filename = fName;
+  }
+}
+class XMLDataReady  {
+  
+  constructor( ) {
+  }
+  
+  Data(last_node ) {
+    console.log("read a new node " + last_node.vref)
+  }
+  
+  Finished(last_node ) {
+    console.log("all data was read")
   }
 }
 class XMLNode  {
   
-  constructor(source ,start ,end  ) {
-    this.code;
-    this.sp = 0;
-    this.ep = 0;
+  constructor( ) {
     this.vref = "";
     this.ns = [];     /** note: unused */
     this.value_type = 0;
@@ -21,19 +29,15 @@ class XMLNode  {
     this.children = [];
     this.attrs = [];
     this.parent;
-    this.code = source;
-    this.sp = start;
-    this.ep = end;
-  }
-  
-  getString() {
-    return this.code.code.substring(this.sp, this.ep );
   }
 }
 class XMLParser  {
   
-  constructor(code_module  ) {
-    this.code;
+  constructor(from  ) {
+    this.has_data = false;
+    this.no_more_data = false;
+    this.inStream;
+    this.onReady;
     this.buff;
     this.len = 0;
     this.i = 0;
@@ -44,9 +48,22 @@ class XMLParser  {
     this.curr_node;
     this.last_finished;
     this.tag_depth = 0;
-    this.buff = code_module.code;
-    this.code = code_module;
-    this.len = (this.buff).length;
+    this.inStream = from;
+    this.inStream.on('data', (data) => {
+      this.inStream.pause()
+      this.has_data = true;
+      this.len = data.length;
+      this.buff = data;
+      this.i = 0;
+      if ( typeof(this.onReady) != "undefined" ) {
+        this.askMore(this.onReady);
+      }
+    });
+    this.inStream.on('end', () => {
+      this.no_more_data = true;
+      this.len = 0;
+      this.i = 0;
+    });
   }
   
   parse_attributes() {
@@ -59,14 +76,14 @@ class XMLParser  {
     var c = 0
     var cc1 = 0
     var cc2 = 0
-    cc1 = s.charCodeAt(this.i );
+    cc1 = s[this.i];
     while (this.i < this.len) {
       last_i = this.i;
-      while ((this.i < this.len) && ((s.charCodeAt(this.i )) <= 32)) {
+      while ((this.i < this.len) && ((s[this.i]) <= 32)) {
         this.i = 1 + this.i;
       }
-      cc1 = s.charCodeAt(this.i );
-      cc2 = s.charCodeAt((this.i + 1) );
+      cc1 = s[this.i];
+      cc2 = s[(this.i + 1)];
       if ( this.i >= this.len ) {
         break;
       }
@@ -79,44 +96,44 @@ class XMLParser  {
       }
       sp = this.i;
       ep = this.i;
-      c = s.charCodeAt(this.i );
+      c = s[this.i];
       while ((this.i < this.len) && ((((((c >= 65) && (c <= 90)) || ((c >= 97) && (c <= 122))) || ((c >= 48) && (c <= 57))) || (c == (95))) || (c == (45)))) {
         this.i = 1 + this.i;
-        c = s.charCodeAt(this.i );
+        c = s[this.i];
       }
       this.i = this.i - 1;
       var an_sp = sp
       var an_ep = this.i
-      c = s.charCodeAt(this.i );
+      c = s[this.i];
       while ((this.i < this.len) && (c != (61))) {
         this.i = 1 + this.i;
-        c = s.charCodeAt(this.i );
+        c = s[this.i];
       }
       if ( c == (61) ) {
         this.i = 1 + this.i;
       }
-      while ((this.i < this.len) && ((s.charCodeAt(this.i )) <= 32)) {
+      while ((this.i < this.len) && ((s[this.i]) <= 32)) {
         this.i = 1 + this.i;
       }
       if ( this.i >= this.len ) {
         break;
       }
-      c = s.charCodeAt(this.i );
+      c = s[this.i];
       if ( c == 34 ) {
         this.i = this.i + 1;
         sp = this.i;
         ep = this.i;
-        c = s.charCodeAt(this.i );
+        c = s[this.i];
         while ((this.i < this.len) && (c != 34)) {
           this.i = 1 + this.i;
-          c = s.charCodeAt(this.i );
+          c = s[this.i];
         }
         ep = this.i;
         if ( (this.i < this.len) && (ep > sp) ) {
-          var new_attr = new XMLNode(this.code, an_sp, ep)
-          new_attr.value_type = 19;
-          new_attr.vref = s.substring(an_sp, (an_ep + 1) );
-          new_attr.string_value = s.substring(sp, ep );
+          var new_attr = new XMLNode()
+          new_attr.value_type = 3;
+          new_attr.vref = s.slice( an_sp,  (an_ep + 1) ).toString();
+          new_attr.string_value = s.slice( sp,  ep ).toString();
           this.curr_node.attrs.push(new_attr);
         }
         this.i = 1 + this.i;
@@ -132,6 +149,34 @@ class XMLParser  {
     return this.last_finished;
   }
   
+  getMoreData() {
+  }
+  
+  askMore(cb ) {
+    if ( this.no_more_data ) {
+      if ( typeof(this.onReady) != "undefined" ) {
+        if ( typeof(this.last_finished) != "undefined" ) {
+          this.onReady.Finished(this.last_finished);
+        }
+      }
+      return;
+    }
+    this.onReady = cb;
+    if ( this.has_data ) {
+      if ( this.i >= (this.len - 1) ) {
+        this.inStream.resume()
+      } else {
+        if ( this.pull() ) {
+          if ( typeof(this.last_finished) != "undefined" ) {
+            this.onReady.Data(this.last_finished);
+          }
+        } else {
+          this.onReady.Finished(this.last_finished);
+        }
+      }
+    }
+  }
+  
   pull() {
     var s_4 = this.buff
     var c_4 = 0
@@ -143,18 +188,21 @@ class XMLParser  {
     var last_i_4 = 0
     var cc1_4 = 0
     var cc2_4 = 0
+    if ( this.i >= (this.len - 1) ) {
+      return false;
+    }
     while (this.i < this.len) {
       this.last_finished = this.curr_node;
       last_i_4 = this.i;
       if ( this.i >= (this.len - 1) ) {
         return false;
       }
-      cc1_4 = s_4.charCodeAt(this.i );
-      cc2_4 = s_4.charCodeAt((this.i + 1) );
+      cc1_4 = s_4[this.i];
+      cc2_4 = s_4[(this.i + 1)];
       if ( cc1_4 == (62) ) {
         this.i = this.i + 1;
-        cc1_4 = s_4.charCodeAt(this.i );
-        cc2_4 = s_4.charCodeAt((this.i + 1) );
+        cc1_4 = s_4[this.i];
+        cc2_4 = s_4[(this.i + 1)];
         continue;
       }
       if ( ((47) == cc1_4) && (cc2_4 == (62)) ) {
@@ -179,10 +227,10 @@ class XMLParser  {
         this.i = this.i + 2;
         sp_4 = this.i;
         ep_4 = this.i;
-        c_4 = s_4.charCodeAt(this.i );
+        c_4 = s_4[this.i];
         while (((this.i < this.len) && (c_4 > 32)) && (c_4 != (62))) {
           this.i = 1 + this.i;
-          c_4 = s_4.charCodeAt(this.i );
+          c_4 = s_4[this.i];
         }
         ep_4 = this.i;
         this.parents.pop();
@@ -200,24 +248,24 @@ class XMLParser  {
         this.i = this.i + 1;
         sp_4 = this.i;
         ep_4 = this.i;
-        c_4 = s_4.charCodeAt(this.i );
+        c_4 = s_4[this.i];
         while (((this.i < this.len) && (c_4 != (62))) && (((((((c_4 >= 65) && (c_4 <= 90)) || ((c_4 >= 97) && (c_4 <= 122))) || ((c_4 >= 48) && (c_4 <= 57))) || (c_4 == 95)) || (c_4 == 46)) || (c_4 == 64))) {
           this.i = 1 + this.i;
-          c_4 = s_4.charCodeAt(this.i );
+          c_4 = s_4[this.i];
         }
         ep_4 = this.i;
-        var new_tag = s_4.substring(sp_4, ep_4 )
+        var new_tag = s_4.slice( sp_4,  ep_4 ).toString()
         if ( typeof(this.curr_node) === "undefined" ) {
-          var new_rnode = new XMLNode(this.code, sp_4, ep_4)
+          var new_rnode = new XMLNode()
           new_rnode.vref = new_tag;
-          new_rnode.value_type = 17;
+          new_rnode.value_type = 1;
           this.rootNode = new_rnode;
           this.parents.push(new_rnode);
           this.curr_node = new_rnode;
         } else {
-          var new_node_10 = new XMLNode(this.code, sp_4, ep_4)
+          var new_node_10 = new XMLNode()
           new_node_10.vref = new_tag;
-          new_node_10.value_type = 17;
+          new_node_10.value_type = 1;
           this.curr_node.children.push(new_node_10);
           this.parents.push(new_node_10);
           new_node_10.parent = this.curr_node;
@@ -232,17 +280,19 @@ class XMLParser  {
       if ( typeof(this.curr_node) !== "undefined" ) {
         sp_4 = this.i;
         ep_4 = this.i;
-        c_4 = s_4.charCodeAt(this.i );
+        c_4 = s_4[this.i];
         while ((this.i < this.len) && (c_4 != (60))) {
           this.i = 1 + this.i;
-          c_4 = s_4.charCodeAt(this.i );
+          c_4 = s_4[this.i];
         }
         ep_4 = this.i;
         if ( ep_4 > sp_4 ) {
-          var new_node_15 = new XMLNode(this.code, sp_4, ep_4)
-          new_node_15.string_value = s_4.substring(sp_4, ep_4 );
-          new_node_15.value_type = 18;
+          var new_node_15 = new XMLNode()
+          new_node_15.string_value = s_4.slice( sp_4,  ep_4 ).toString();
+          new_node_15.value_type = 2;
           this.curr_node.children.push(new_node_15);
+          this.last_finished = new_node_15;
+          return true;
         }
       }
       if ( last_i_4 == this.i ) {
@@ -256,45 +306,46 @@ class XMLParser  {
     return true;
   }
 }
-class tester  {
+class myDataHandler  extends XMLDataReady {
+  
+  constructor(p  ) {
+    super()
+    this.parser;
+    this.parser = p;
+  }
+  
+  Data(last_node ) {
+    switch (last_node.value_type ) { 
+      case 1 : 
+        console.log("read a new node " + last_node.vref)
+        break;
+      case 2 : 
+        console.log("text : " + last_node.string_value)
+        break;
+    }
+    process.nextTick( () => {
+      this.parser.askMore(this)
+    })
+  }
+  
+  Finished(last_node ) {
+    console.log("all data was read")
+  }
+}
+class streamTester  {
   
   constructor( ) {
+  }
+  
+  read(fileName ) {
+    var inS = require('fs').createReadStream(new File(fileName).filename)
+    var parser = new XMLParser(inS)
+    var handler = new myDataHandler(parser)
+    parser.askMore(handler);
   }
 }
 
 
 /* static JavaSript main routine */
-console.log("Testing XML parser")
-var read_code = "<View padding=\"2px\" margin=\"3px\" background-color=\"#fef6f2\" >\r\n    <View width=\"100%\" padding=\"10px\" id=\"stats1\" >\r\n        <View padding=\"20px\" width=\"dss\" >\r\n        Some text here...\r\n        </View>\r\n        <View padding=\"20px\" width=\"dss\" >\r\n        Some text here...\r\n        </View>\r\n\r\n        <View padding=\"20px\" width=\"dss\" >\r\n        Some text here...\r\n        </View>    </View>\r\n\r\n        <View padding=\"20px\" width=\"dss\" >\r\n        Some text here...\r\n        </View>\r\n</View></View>"
-var the_code = new SourceCode(read_code)
-var p = new XMLParser(the_code)
-console.time("Time for parsing the code:");
-while (p.pull()) {
-  var last = p.last()
-  console.log("-> pulled a new node " + last.vref)
-  var last_11 = p.last_finished
-  for ( var i = 0; i < last_11.children.length; i++) {
-    var ch = last_11.children[i];
-    if ( ch.value_type == 18 ) {
-      console.log("text : " + ch.string_value)
-    } else {
-      console.log("child : " + ch.vref)
-    }
-  }
-  for ( var i_10 = 0; i_10 < last_11.attrs.length; i_10++) {
-    var attr = last_11.attrs[i_10];
-    console.log((attr.vref + " = ") + attr.string_value)
-  }
-}
-var last_12 = p.last()
-console.log("The children of the last node are " + last_12.vref)
-for ( var i_12 = 0; i_12 < last_12.children.length; i_12++) {
-  var ch_8 = last_12.children[i_12];
-  if ( ch_8.value_type == 18 ) {
-    console.log("text : " + ch_8.string_value)
-  } else {
-    console.log("child : " + ch_8.vref)
-  }
-}
-console.timeEnd("Time for parsing the code:");
-console.log("--- done --- ")
+var tester = new streamTester()
+tester.read("testCode.xml");

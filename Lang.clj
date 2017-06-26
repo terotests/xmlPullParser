@@ -209,8 +209,22 @@ func r_write_text_file(pathName string, fileName string, txtData string)  {
         
 
         read_file        cmdReadFile@(optional):string (path:string filename:string) {
+            ; C++ https://www.reddit.com/r/learnprogramming/comments/3qotqr/how_can_i_read_an_entire_text_file_into_a_string/
             templates {
                 ranger (  "(read_file " (e 1) " " (e 2) ")" )
+                cpp ( "r_cpp_readFile( " (e 1) " " (e 2) ")" 
+
+(create_polyfill "
+std::string  r_cpp_readFile(std::string path, std::string filename) 
+{
+  std::ifstream ifs(path + \"/\" + filename);
+  std::string content( (std::istreambuf_iterator<char>(ifs) ),
+                       (std::istreambuf_iterator<char>()    ) );
+  return content
+}    
+    ")                        
+            
+                )
                 php ("file_get_contents(" (e 1) " . \"/\" . " (e 2) ") " )
                 swift3 ("try String(contentsOfFile: " (e 1) " + \"/\" + " (e 2) ") " )
                 java7 ( "Optional.of(readFile(" (e 1) " + \"/\" + " (e 2) " , StandardCharsets.UTF_8 ))"  

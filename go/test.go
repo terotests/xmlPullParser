@@ -569,7 +569,7 @@ func CreateNew_tester() *tester {
 }
 func main() {
   fmt.Println( "Testing XML parser" )
-  var read_code string = "<div>\r\n                hello World <span/>\r\n                <span/>\r\n                <ul style=\"color:green;\">\r\n                    <li>Ferrari <span>F50</span></li>\r\n                    <li>Ford</li>\r\n                </ul></div>";
+  var read_code string = "<View padding=\"2px\" margin=\"3px\" background-color=\"#fef6f2\" >\r\n    <View width=\"100%\" padding=\"10px\" id=\"stats1\" >\r\n        <View padding=\"20px\" width=\"dss\" >\r\n        Some text here...\r\n        </View>\r\n        <View padding=\"20px\" width=\"dss\" >\r\n        Some text here...\r\n        </View>\r\n\r\n        <View padding=\"20px\" width=\"dss\" >\r\n        Some text here...\r\n        </View>    </View>\r\n\r\n        <View padding=\"20px\" width=\"dss\" >\r\n        Some text here...\r\n        </View>\r\n</View></View>";
   var the_code *SourceCode = CreateNew_SourceCode(read_code);
   var p *XMLParser = CreateNew_XMLParser(the_code);
   for {
