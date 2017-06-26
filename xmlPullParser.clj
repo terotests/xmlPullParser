@@ -79,6 +79,7 @@ class XMLParser:void {
     buff = (to_charbuffer code_module.code)
     code = code_module
     len = (length (unwrap buff))
+    i = 0
   }
  
   fn parse_attributes:boolean () {

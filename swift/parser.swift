@@ -43,6 +43,7 @@ class XMLParser {
     buff = Array(code_module.code.utf8);
     code = code_module;
     len = (buff!).count;
+    i = 0;
   }
   func parse_attributes() -> Bool {
     let s : [UInt8] = buff!

@@ -47,6 +47,7 @@ class XMLParser  {
     this.buff = code_module.code;
     this.code = code_module;
     this.len = (this.buff).length;
+    this.i = 0;
   }
   
   parse_attributes() {
@@ -265,7 +266,7 @@ class tester  {
 
 /* static JavaSript main routine */
 console.log("Testing XML parser")
-var read_code = "<View padding=\"2px\" margin=\"3px\" background-color=\"#fef6f2\" >\r\n    <View width=\"100%\" padding=\"10px\" id=\"stats1\" >\r\n        <View padding=\"20px\" width=\"dss\" >\r\n        Some text here...\r\n        </View>\r\n        <View padding=\"20px\" width=\"dss\" >\r\n        Some text here...\r\n        </View>\r\n\r\n        <View padding=\"20px\" width=\"dss\" >\r\n        Some text here...\r\n        </View>    </View>\r\n\r\n        <View padding=\"20px\" width=\"dss\" >\r\n        Some text here...\r\n        </View>\r\n</View></View>"
+var read_code = "<View padding=\"2px\" margin=\"3px\" background-color=\"#fef6f2\" >\r\n    <View width=\"100%\" padding=\"10px\" id=\"stats1\" >\r\n        <View padding=\"20px\" width=\"dss\" >\r\n        Some text here...\r\n        </View>\r\n        <View padding=\"20px\" width=\"dss\" >\r\n        Some text here...\r\n        </View>\r\n    </View>\r\n</View>"
 var the_code = new SourceCode(read_code)
 var p = new XMLParser(the_code)
 console.time("Time for parsing the code:");

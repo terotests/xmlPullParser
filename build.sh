@@ -12,3 +12,10 @@ ranger-compiler test.clj Lang.clj swift3 swift test.swift
 ranger-compiler test.clj Lang.clj java7 java parser.java
 ranger-compiler test.clj Lang.clj php php parser.php
 ranger-compiler test.clj Lang.clj cpp cpp test.cpp
+
+ranger-compiler test2.clj Lang.clj cpp cpp test2.cpp
+ranger-compiler test2.clj Lang.clj go go test2.go
+ranger-compiler test2.clj Lang.clj es6 es6 test2.js
+ranger-compiler test2.clj Lang.clj swift3 swift test2.swift
+ranger-compiler test2.clj Lang.clj php php test2.php
+ranger-compiler test2.clj Lang.clj java7 java/test2 test2.java

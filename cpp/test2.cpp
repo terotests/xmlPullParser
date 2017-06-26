@@ -1,6 +1,7 @@
 #include  <string>
 #include  <vector>
 #include  <iostream>
+#include  <fstream>
 #include  <ctime>
 
 // define classes here to avoid compiler errors
@@ -63,6 +64,15 @@ class tester {
     static void m();
 };
 
+
+std::string  r_cpp_readFile(std::string path, std::string filename) 
+{
+  std::ifstream ifs(path + "/" + filename);
+  std::string content( (std::istreambuf_iterator<char>(ifs) ),
+                       (std::istreambuf_iterator<char>()    ) );
+  return content;
+}    
+    
 
 SourceCode::SourceCode( std::string code_str  ) {
   code = code_str;
@@ -297,7 +307,7 @@ tester::tester( ) {
 
 int main(int argc, char* argv[]) {
   std::cout << std::string("Testing XML parser") << std::endl;
-  std::string read_code = std::string("<View padding=\"2px\" margin=\"3px\" background-color=\"#fef6f2\" >\r\n    <View width=\"100%\" padding=\"10px\" id=\"stats1\" >\r\n        <View padding=\"20px\" width=\"dss\" >\r\n        Some text here...\r\n        </View>\r\n        <View padding=\"20px\" width=\"dss\" >\r\n        Some text here...\r\n        </View>\r\n    </View>\r\n</View>");
+  std::string read_code = (r_cpp_readFile( std::string(".") , std::string("testCode.xml")));
   std::shared_ptr<SourceCode> the_code =  std::make_shared<SourceCode>(read_code);
   std::shared_ptr<XMLParser> p =  std::make_shared<XMLParser>(the_code);
   std::clock_t __begin = std::clock();

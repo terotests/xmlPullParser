@@ -49,6 +49,7 @@ class XMLParser:void {
 
   Constructor (from:ReadableStream) {
     inStream = from
+    i = 0
   }
  
   fn parse_attributes:boolean () {

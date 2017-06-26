@@ -212,15 +212,14 @@ func r_write_text_file(pathName string, fileName string, txtData string)  {
             ; C++ https://www.reddit.com/r/learnprogramming/comments/3qotqr/how_can_i_read_an_entire_text_file_into_a_string/
             templates {
                 ranger (  "(read_file " (e 1) " " (e 2) ")" )
-                cpp ( "r_cpp_readFile( " (e 1) " " (e 2) ")" 
-
+                cpp ( "r_cpp_readFile( " (e 1) " , " (e 2) ")" (imp "<fstream>")
 (create_polyfill "
 std::string  r_cpp_readFile(std::string path, std::string filename) 
 {
   std::ifstream ifs(path + \"/\" + filename);
   std::string content( (std::istreambuf_iterator<char>(ifs) ),
                        (std::istreambuf_iterator<char>()    ) );
-  return content
+  return content;
 }    
     ")                        
             
@@ -990,7 +989,7 @@ func r_io_read_file( path string , fileName string ) *GoNullable {
                 ranger ( "(to_charbuffer " (e 1) ")") 
                 swift3 ( "Array(" (e 1) ".utf8)" )
                 scala ( (e 1) ".toCharArray.map(_.toByte)")
-                java7 ( (e 1) ".toCharArray()" )
+                java7 ( (e 1) ".getBytes()" )
                 csharp ( "Encoding.ASCII.GetBytes(" (e 1) ")")
                 kotlin ( (e 1 ) ".toCharArray()" )
                 rust ( (e 1) ".into_bytes()")
@@ -1080,7 +1079,7 @@ func r_io_read_file( path string , fileName string ) *GoNullable {
                 ranger ( "(charcode " (e 1) ")")
                 go ( "[]byte(" (e 1) ")[0]" )
                 php ( "ord(" (e 1) "[0])") 
-                java7 ( "((" (e 1) ".charAt(0)))") 
+                java7 ( "((" (e 1) ".getBytes())[0])") 
                 * ( (e 1) ".charCodeAt(0)" )
             }
         }

@@ -1,6 +1,7 @@
 package main
 import (
   "fmt"
+  "io/ioutil"
   "strings"
   "time"
 )
@@ -8,6 +9,20 @@ import (
 type GoNullable struct { 
   value interface{}
   has_value bool
+}
+
+
+
+// polyfill for reading files
+func r_io_read_file( path string , fileName string ) *GoNullable {
+   res := new(GoNullable);
+   if v, err := ioutil.ReadFile(path + "/" + fileName); err == nil {
+     res.has_value = true
+     res.value = string(v)
+   } else {
+     res.has_value = false
+   }
+   return res 
 }
 
 type SourceCode struct { 
@@ -570,7 +585,7 @@ func CreateNew_tester() *tester {
 }
 func main() {
   fmt.Println( "Testing XML parser" )
-  var read_code string = "<View padding=\"2px\" margin=\"3px\" background-color=\"#fef6f2\" >\r\n    <View width=\"100%\" padding=\"10px\" id=\"stats1\" >\r\n        <View padding=\"20px\" width=\"dss\" >\r\n        Some text here...\r\n        </View>\r\n        <View padding=\"20px\" width=\"dss\" >\r\n        Some text here...\r\n        </View>\r\n    </View>\r\n</View>";
+  var read_code string = (r_io_read_file(".", "testCode.xml")).value.(string);
   var the_code *SourceCode = CreateNew_SourceCode(read_code);
   var p *XMLParser = CreateNew_XMLParser(the_code);
   for {

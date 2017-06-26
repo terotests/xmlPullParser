@@ -249,6 +249,7 @@ func CreateNew_XMLParser(code_module *SourceCode) *XMLParser {
   me.code.value = code_module;
   me.code.has_value = true; /* detected as non-optional */
   me.len = int64(len((me.buff.value.([]byte)))); 
+  me.i = 0; 
   return me;
 }
 func (this *XMLParser) parse_attributes () bool {

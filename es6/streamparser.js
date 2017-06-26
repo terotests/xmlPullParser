@@ -1,5 +1,5 @@
 
-class File  {
+class InputFile  {
   
   constructor(fName  ) {
     this.filename = "";
@@ -51,6 +51,7 @@ class XMLParser  {
     this.last_finished;
     this.tag_depth = 0;
     this.inStream = from;
+    this.i = 0;
   }
   
   parse_attributes() {

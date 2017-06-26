@@ -5,18 +5,10 @@ class tester {
     sfn m@(main):void () {
         print "Testing XML parser"
 
-        def read_code:string "<View padding=\"2px\" margin=\"3px\" background-color=\"#fef6f2\" >
-    <View width=\"100%\" padding=\"10px\" id=\"stats1\" >
-        <View padding=\"20px\" width=\"dss\" >
-        Some text here...
-        </View>
-        <View padding=\"20px\" width=\"dss\" >
-        Some text here...
-        </View>
-    </View>
-</View>"
+        def read_code:string (unwrap (read_file "." "testCode.xml"))
         def the_code:SourceCode (new SourceCode ( read_code ))
         def p:XMLParser (new XMLParser (the_code))
+
         timer "Time for parsing the code:" {
             while( p.pull() ) {
                 def last:XMLNode (p.last())

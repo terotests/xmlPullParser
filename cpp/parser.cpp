@@ -53,6 +53,7 @@ class XMLParser {
     bool pull();
 };
 
+
 SourceCode::SourceCode( std::string code_str  ) {
   code = code_str;
 }
@@ -71,6 +72,7 @@ XMLParser::XMLParser( std::shared_ptr<SourceCode> code_module  ) {
   buff  = code_module->code.c_str();
   code  = code_module;
   len = strlen( (buff) );
+  i = 0;
 }
 
 bool  XMLParser::parse_attributes() {

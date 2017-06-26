@@ -291,7 +291,7 @@ class tester {
 
 /* static PHP main routine */
 echo( "Testing XML parser" . "\n");
-$read_code = "<View padding=\"2px\" margin=\"3px\" background-color=\"#fef6f2\" >\r\n    <View width=\"100%\" padding=\"10px\" id=\"stats1\" >\r\n        <View padding=\"20px\" width=\"dss\" >\r\n        Some text here...\r\n        </View>\r\n        <View padding=\"20px\" width=\"dss\" >\r\n        Some text here...\r\n        </View>\r\n    </View>\r\n</View>";
+$read_code = (file_get_contents("." . "/" . "testCode.xml") );
 $the_code =  new SourceCode($read_code);
 $p =  new XMLParser($the_code);
 $time_start = microtime(true);

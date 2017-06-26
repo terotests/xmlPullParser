@@ -254,7 +254,7 @@ class XMLParser {
 class tester { 
 }
 print("Testing XML parser")
-let read_code : String = "<View padding=\"2px\" margin=\"3px\" background-color=\"#fef6f2\" >\r\n    <View width=\"100%\" padding=\"10px\" id=\"stats1\" >\r\n        <View padding=\"20px\" width=\"dss\" >\r\n        Some text here...\r\n        </View>\r\n        <View padding=\"20px\" width=\"dss\" >\r\n        Some text here...\r\n        </View>\r\n    </View>\r\n</View>"
+let read_code : String = (try String(contentsOfFile: "." + "/" + "testCode.xml") )!
 let the_code : SourceCode = SourceCode(code_str : read_code)
 let p : XMLParser = XMLParser(code_module : the_code)
 do {

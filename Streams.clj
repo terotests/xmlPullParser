@@ -2,7 +2,7 @@
 ; --------------------------------------------------------------------------------------
 ; Support classes
 
-class File {
+class InputFile {
     def filename:string ""
 	Constructor (fName:string) {
         filename = fName
@@ -59,12 +59,14 @@ operators {
 
     to_charbuffer stream:charbuffer ( chunk:StreamChunk ) {
         templates {
+            java7 ( (e 1) )
             es6 ( (e 1) )
         }        
     }
 
-    create_read_stream http:ReadableStream ( input:File ) {
+    create_read_stream stream:ReadableStream ( input:InputFile ) {
         templates {
+            java7 ( " new FileInputStream(" (e 1) ".filename) ")
             es6 ("require('fs').createReadStream(" (e 1) ".filename)")
         }
     }
@@ -81,7 +83,7 @@ operators {
         }                
     }
 
-    read http:void ( stream:ReadableStream chunk@(define):StreamChunk read_code:block end_code:block) {
+    read stream:void ( stream:ReadableStream chunk@(define):StreamChunk read_code:block end_code:block) {
         templates {
             es6 ( (e 1)".on('data', (" (e 2) ") => {" nl 
                     I
@@ -91,6 +93,9 @@ operators {
                 (e 1)".on('end', () => {" nl 
                     I (block 4)
                     nl i "});" nl
+            )
+            java7 (
+                
             )
         }
     } 

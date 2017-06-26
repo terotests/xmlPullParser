@@ -257,3 +257,45 @@ class XMLParser  {
     return true;
   }
 }
+class tester  {
+  
+  constructor( ) {
+  }
+}
+
+
+/* static JavaSript main routine */
+console.log("Testing XML parser")
+var read_code = ((require('fs').readFileSync( process.cwd() + '/' + "." + '/' + "testCode.xml" , 'utf8')))
+var the_code = new SourceCode(read_code)
+var p = new XMLParser(the_code)
+console.time("Time for parsing the code:");
+while (p.pull()) {
+  var last = p.last()
+  console.log("-> pulled a new node " + last.vref)
+  var last_11 = p.last_finished
+  for ( var i = 0; i < last_11.children.length; i++) {
+    var ch = last_11.children[i];
+    if ( ch.value_type == 18 ) {
+      console.log("text : " + ch.string_value)
+    } else {
+      console.log("child : " + ch.vref)
+    }
+  }
+  for ( var i_10 = 0; i_10 < last_11.attrs.length; i_10++) {
+    var attr = last_11.attrs[i_10];
+    console.log((attr.vref + " = ") + attr.string_value)
+  }
+}
+var last_12 = p.last()
+console.log("The children of the last node are " + last_12.vref)
+for ( var i_12 = 0; i_12 < last_12.children.length; i_12++) {
+  var ch_8 = last_12.children[i_12];
+  if ( ch_8.value_type == 18 ) {
+    console.log("text : " + ch_8.string_value)
+  } else {
+    console.log("child : " + ch_8.vref)
+  }
+}
+console.timeEnd("Time for parsing the code:");
+console.log("--- done --- ")

@@ -1,11 +1,27 @@
 import java.io.*;
 import java.util.Optional;
+import java.nio.file.Paths;
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 class tester { 
   
+  static String readFile(String path, Charset encoding) 
+  {
+    try {
+      byte[] encoded = Files.readAllBytes(Paths.get(path));
+      return new String(encoded, encoding);
+    } catch(IOException e) { 
+      return "";
+    }
+  }    
+      
+  
   public static void main(String [] args ) {
     System.out.println(String.valueOf( "Testing XML parser" ) );
-    final String read_code = "<View padding=\"2px\" margin=\"3px\" background-color=\"#fef6f2\" >\r\n    <View width=\"100%\" padding=\"10px\" id=\"stats1\" >\r\n        <View padding=\"20px\" width=\"dss\" >\r\n        Some text here...\r\n        </View>\r\n        <View padding=\"20px\" width=\"dss\" >\r\n        Some text here...\r\n        </View>\r\n    </View>\r\n</View>";
+    final String read_code = (Optional.of(readFile("." + "/" + "testCode.xml" , StandardCharsets.UTF_8 ))).get();
     final SourceCode the_code = new SourceCode(read_code);
     final XMLParser p = new XMLParser(the_code);
     long startTime = System.nanoTime();
