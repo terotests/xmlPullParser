@@ -6,7 +6,7 @@ class SourceCode {
   var $ep;
   
   function __construct( $code_str  ) {
-    $this->code = "";
+    $this->code = '';
     $this->sp = 0;     /** note: unused */
     $this->ep = 0;     /** note: unused */
     $this->code = $code_str;
@@ -28,10 +28,10 @@ class XMLNode {
     $this->code;
     $this->sp = 0;
     $this->ep = 0;
-    $this->vref = "";
+    $this->vref = '';
     $this->ns = array();     /** note: unused */
     $this->value_type = 0;
-    $this->string_value = "";
+    $this->string_value = '';
     $this->children = array();
     $this->attrs = array();
     $this->parent;
@@ -79,7 +79,7 @@ class XMLParser {
     $s = $this->buff;
     $last_i = 0;
     $do_break = false;
-    /** unused:  $attr_name = ""   **/ ;
+    /** unused:  $attr_name = ''   **/ ;
     $sp = $this->i;
     $ep = $this->i;
     $c = 0;
@@ -290,38 +290,38 @@ class tester {
 }
 
 /* static PHP main routine */
-echo( "Testing XML parser" . "\n");
-$read_code = "<View padding=\"2px\" margin=\"3px\" background-color=\"#fef6f2\" >\r\n    <View width=\"100%\" padding=\"10px\" id=\"stats1\" >\r\n        <View padding=\"20px\" width=\"dss\" >\r\n        Some text here...\r\n        </View>\r\n        <View padding=\"20px\" width=\"dss\" >\r\n        Some text here...\r\n        </View>\r\n    </View>\r\n</View>";
+echo( 'Testing XML parser' . "\n");
+$read_code = '<View padding=\"2px\" margin=\"3px\" background-color=\"#fef6f2\" >\r\n    <View width=\"100%\" padding=\"10px\" id=\"stats1\" >\r\n        <View padding=\"20px\" width=\"dss\" >\r\n        Some text here...\r\n        </View>\r\n        <View padding=\"20px\" width=\"dss\" >\r\n        Some text here...\r\n        </View>\r\n    </View>\r\n</View>';
 $the_code =  new SourceCode($read_code);
 $p =  new XMLParser($the_code);
 $time_start = microtime(true);
 while ($p->pull()) {
   $last = $p->last();
-  echo( "-> pulled a new node " . $last->vref . "\n");
+  echo( '-> pulled a new node ' . $last->vref . "\n");
   $last_11 = $p->last_finished;
   for ( $i = 0; $i < count($last_11->children); $i++) {
     $ch = $last_11->children[$i];
     if ( $ch->value_type == 18 ) {
-      echo( "text : " . $ch->string_value . "\n");
+      echo( 'text : ' . $ch->string_value . "\n");
     } else {
-      echo( "child : " . $ch->vref . "\n");
+      echo( 'child : ' . $ch->vref . "\n");
     }
   }
   for ( $i_10 = 0; $i_10 < count($last_11->attrs); $i_10++) {
     $attr = $last_11->attrs[$i_10];
-    echo( ($attr->vref . " = ") . $attr->string_value . "\n");
+    echo( ($attr->vref . ' = ') . $attr->string_value . "\n");
   }
 }
 $last_12 = $p->last();
-echo( "The children of the last node are " . $last_12->vref . "\n");
+echo( 'The children of the last node are ' . $last_12->vref . "\n");
 for ( $i_12 = 0; $i_12 < count($last_12->children); $i_12++) {
   $ch_8 = $last_12->children[$i_12];
   if ( $ch_8->value_type == 18 ) {
-    echo( "text : " . $ch_8->string_value . "\n");
+    echo( 'text : ' . $ch_8->string_value . "\n");
   } else {
-    echo( "child : " . $ch_8->vref . "\n");
+    echo( 'child : ' . $ch_8->vref . "\n");
   }
 }
 $time_end = microtime(true);
-echo("Time for parsing the code:".($time_end - $time_start)."\n");
-echo( "--- done --- " . "\n");
+echo('Time for parsing the code:'.($time_end - $time_start)."\n");
+echo( '--- done --- ' . "\n");
