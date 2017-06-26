@@ -25,33 +25,23 @@ class tester {
     final SourceCode the_code = new SourceCode(read_code);
     final XMLParser p = new XMLParser(the_code);
     long startTime = System.nanoTime();
+    int node_cnt = 0;
+    int text_cnt = 0;
     while (p.pull()) {
-      final XMLNode last = p.last();
-      System.out.println(String.valueOf( "-> pulled a new node " + last.vref ) );
+      /** unused:  final XMLNode last = p.last()   **/ ;
       final XMLNode last_11 = p.last_finished.get();
       for ( int i = 0; i < last_11.children.size(); i++) {
         XMLNode ch = last_11.children.get(i);
         if ( ch.value_type == 18 ) {
-          System.out.println(String.valueOf( "text : " + ch.string_value ) );
+          node_cnt = node_cnt + 1;
         } else {
-          System.out.println(String.valueOf( "child : " + ch.vref ) );
+          text_cnt = text_cnt + 1;
         }
-      }
-      for ( int i_10 = 0; i_10 < last_11.attrs.size(); i_10++) {
-        XMLNode attr = last_11.attrs.get(i_10);
-        System.out.println(String.valueOf( (attr.vref + " = ") + attr.string_value ) );
       }
     }
     final XMLNode last_12 = p.last();
-    System.out.println(String.valueOf( "The children of the last node are " + last_12.vref ) );
-    for ( int i_12 = 0; i_12 < last_12.children.size(); i_12++) {
-      XMLNode ch_8 = last_12.children.get(i_12);
-      if ( ch_8.value_type == 18 ) {
-        System.out.println(String.valueOf( "text : " + ch_8.string_value ) );
-      } else {
-        System.out.println(String.valueOf( "child : " + ch_8.vref ) );
-      }
-    }
+    System.out.println(String.valueOf( "Last node was" + last_12.vref ) );
+    System.out.println(String.valueOf( ((("Collected " + node_cnt) + " nodes and ") + text_cnt) + " text nodes" ) );
     long elapsedTime = System.nanoTime() - startTime;
     System.out.println( "Time for parsing the code:"+ String.valueOf((double)elapsedTime / 1000000000.0));
     System.out.println(String.valueOf( "--- done --- " ) );

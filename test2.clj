@@ -10,30 +10,23 @@ class tester {
         def p:XMLParser (new XMLParser (the_code))
 
         timer "Time for parsing the code:" {
+            def node_cnt:int 0
+            def text_cnt:int 0 
             while( p.pull() ) {
                 def last:XMLNode (p.last())
-                print "-> pulled a new node " + (last.vref)
                 def last:XMLNode (unwrap p.last_finished)
                 for last.children ch:XMLNode i {
                     if (ch.value_type == RangerNodeType.XMLText) {
-                        print "text : " + ch.string_value
+                        ; print "text : " + ch.string_value
+                        node_cnt = node_cnt + 1
                     } {
-                        print "child : " + ch.vref
+                        text_cnt = text_cnt + 1
                     }
-                }
-                for last.attrs attr:XMLNode i {
-                    print attr.vref + " = " + attr.string_value
                 }
             }
             def last:XMLNode (p.last())
-            print "The children of the last node are " + (last.vref)
-            for last.children ch:XMLNode i {
-                if (ch.value_type == RangerNodeType.XMLText) {
-                    print "text : " + ch.string_value
-                } {
-                    print "child : " + ch.vref
-                }
-            }
+            print "Last node was" + (last.vref)
+            print "Collected " + node_cnt + " nodes and " + text_cnt + " text nodes"
 
         }
         print "--- done --- "        

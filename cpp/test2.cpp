@@ -75,10 +75,18 @@ std::string  r_cpp_readFile(std::string path, std::string filename)
     
 
 SourceCode::SourceCode( std::string code_str  ) {
+  this->code = std::string("");
+  this->sp = 0;
+  this->ep = 0;
   code = code_str;
 }
 
 XMLNode::XMLNode( std::shared_ptr<SourceCode> source , int start , int end  ) {
+  this->sp = 0;
+  this->ep = 0;
+  this->vref = std::string("");
+  this->value_type = 0;
+  this->string_value = std::string("");
   code  = source;
   sp = start;
   ep = end;
@@ -89,6 +97,9 @@ std::string  XMLNode::getString() {
 }
 
 XMLParser::XMLParser( std::shared_ptr<SourceCode> code_module  ) {
+  this->len = 0;
+  this->i = 0;
+  this->tag_depth = 0;
   buff  = code_module->code.c_str();
   code  = code_module;
   len = strlen( (buff) );
@@ -311,33 +322,23 @@ int main(int argc, char* argv[]) {
   std::shared_ptr<SourceCode> the_code =  std::make_shared<SourceCode>(read_code);
   std::shared_ptr<XMLParser> p =  std::make_shared<XMLParser>(the_code);
   std::clock_t __begin = std::clock();
+  int node_cnt = 0;
+  int text_cnt = 0;
   while (p->pull()) {
-    std::shared_ptr<XMLNode> last = p->last();
-    std::cout << std::string("-> pulled a new node ") + last->vref << std::endl;
+    /** unused:  std::shared_ptr<XMLNode> last = p->last()   **/ ;
     std::shared_ptr<XMLNode> last_11 = p->last_finished;
     for ( std::vector< std::shared_ptr<XMLNode>>::size_type i = 0; i != last_11->children.size(); i++) {
       std::shared_ptr<XMLNode> ch = last_11->children.at(i);
       if ( ch->value_type == 18 ) {
-        std::cout << std::string("text : ") + ch->string_value << std::endl;
+        node_cnt = node_cnt + 1;
       } else {
-        std::cout << std::string("child : ") + ch->vref << std::endl;
+        text_cnt = text_cnt + 1;
       }
-    }
-    for ( std::vector< std::shared_ptr<XMLNode>>::size_type i_10 = 0; i_10 != last_11->attrs.size(); i_10++) {
-      std::shared_ptr<XMLNode> attr = last_11->attrs.at(i_10);
-      std::cout << (attr->vref + std::string(" = ")) + attr->string_value << std::endl;
     }
   }
   std::shared_ptr<XMLNode> last_12 = p->last();
-  std::cout << std::string("The children of the last node are ") + last_12->vref << std::endl;
-  for ( std::vector< std::shared_ptr<XMLNode>>::size_type i_12 = 0; i_12 != last_12->children.size(); i_12++) {
-    std::shared_ptr<XMLNode> ch_8 = last_12->children.at(i_12);
-    if ( ch_8->value_type == 18 ) {
-      std::cout << std::string("text : ") + ch_8->string_value << std::endl;
-    } else {
-      std::cout << std::string("child : ") + ch_8->vref << std::endl;
-    }
-  }
+  std::cout << std::string("Last node was") + last_12->vref << std::endl;
+  std::cout << (((std::string("Collected ") + std::to_string(node_cnt)) + std::string(" nodes and ")) + std::to_string(text_cnt)) + std::string(" text nodes") << std::endl;
   std::clock_t __end = std::clock();
   std::cout << std::string("Time for parsing the code:") << ( double(__end - __begin) / CLOCKS_PER_SEC ) << std::endl;
   std::cout << std::string("--- done --- ") << std::endl;

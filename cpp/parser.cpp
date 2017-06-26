@@ -55,10 +55,18 @@ class XMLParser {
 
 
 SourceCode::SourceCode( std::string code_str  ) {
+  this->code = std::string("");
+  this->sp = 0;
+  this->ep = 0;
   code = code_str;
 }
 
 XMLNode::XMLNode( std::shared_ptr<SourceCode> source , int start , int end  ) {
+  this->sp = 0;
+  this->ep = 0;
+  this->vref = std::string("");
+  this->value_type = 0;
+  this->string_value = std::string("");
   code  = source;
   sp = start;
   ep = end;
@@ -69,6 +77,9 @@ std::string  XMLNode::getString() {
 }
 
 XMLParser::XMLParser( std::shared_ptr<SourceCode> code_module  ) {
+  this->len = 0;
+  this->i = 0;
+  this->tag_depth = 0;
   buff  = code_module->code.c_str();
   code  = code_module;
   len = strlen( (buff) );

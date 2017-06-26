@@ -295,33 +295,23 @@ $read_code = (file_get_contents('.' . "/" . 'testCode.xml') );
 $the_code =  new SourceCode($read_code);
 $p =  new XMLParser($the_code);
 $time_start = microtime(true);
+$node_cnt = 0;
+$text_cnt = 0;
 while ($p->pull()) {
-  $last = $p->last();
-  echo( '-> pulled a new node ' . $last->vref . "\n");
+  /** unused:  $last = $p->last()   **/ ;
   $last_11 = $p->last_finished;
   for ( $i = 0; $i < count($last_11->children); $i++) {
     $ch = $last_11->children[$i];
     if ( $ch->value_type == 18 ) {
-      echo( 'text : ' . $ch->string_value . "\n");
+      $node_cnt = $node_cnt + 1;
     } else {
-      echo( 'child : ' . $ch->vref . "\n");
+      $text_cnt = $text_cnt + 1;
     }
-  }
-  for ( $i_10 = 0; $i_10 < count($last_11->attrs); $i_10++) {
-    $attr = $last_11->attrs[$i_10];
-    echo( ($attr->vref . ' = ') . $attr->string_value . "\n");
   }
 }
 $last_12 = $p->last();
-echo( 'The children of the last node are ' . $last_12->vref . "\n");
-for ( $i_12 = 0; $i_12 < count($last_12->children); $i_12++) {
-  $ch_8 = $last_12->children[$i_12];
-  if ( $ch_8->value_type == 18 ) {
-    echo( 'text : ' . $ch_8->string_value . "\n");
-  } else {
-    echo( 'child : ' . $ch_8->vref . "\n");
-  }
-}
+echo( 'Last node was' . $last_12->vref . "\n");
+echo( ((('Collected ' . $node_cnt) . ' nodes and ') . $text_cnt) . ' text nodes' . "\n");
 $time_end = microtime(true);
 echo('Time for parsing the code:'.($time_end - $time_start)."\n");
 echo( '--- done --- ' . "\n");

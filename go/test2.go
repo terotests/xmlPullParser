@@ -3,6 +3,7 @@ import (
   "fmt"
   "io/ioutil"
   "strings"
+  "strconv"
   "time"
 )
 
@@ -590,36 +591,24 @@ func main() {
   var p *XMLParser = CreateNew_XMLParser(the_code);
   for {
     _start := time.Now()
+    var node_cnt int64 = 0;
+    var text_cnt int64 = 0;
     for p.pull() {
-      var last *XMLNode = p.last();
-      fmt.Println( strings.Join([]string{ "-> pulled a new node ",last.vref }, "") )
+      /** unused:  last*/
       var last_11 *XMLNode = p.last_finished.value.(*XMLNode);
       var i int64 = 0;  
       for ; i < int64(len(last_11.children)) ; i++ {
         ch := last_11.children[i];
         if  ch.value_type == 18 {
-          fmt.Println( strings.Join([]string{ "text : ",ch.string_value }, "") )
+          node_cnt = node_cnt + 1; 
         } else {
-          fmt.Println( strings.Join([]string{ "child : ",ch.vref }, "") )
+          text_cnt = text_cnt + 1; 
         }
-      }
-      var i_10 int64 = 0;  
-      for ; i_10 < int64(len(last_11.attrs)) ; i_10++ {
-        attr := last_11.attrs[i_10];
-        fmt.Println( strings.Join([]string{ (strings.Join([]string{ attr.vref," = " }, "")),attr.string_value }, "") )
       }
     }
     var last_12 *XMLNode = p.last();
-    fmt.Println( strings.Join([]string{ "The children of the last node are ",last_12.vref }, "") )
-    var i_12 int64 = 0;  
-    for ; i_12 < int64(len(last_12.children)) ; i_12++ {
-      ch_8 := last_12.children[i_12];
-      if  ch_8.value_type == 18 {
-        fmt.Println( strings.Join([]string{ "text : ",ch_8.string_value }, "") )
-      } else {
-        fmt.Println( strings.Join([]string{ "child : ",ch_8.vref }, "") )
-      }
-    }
+    fmt.Println( strings.Join([]string{ "Last node was",last_12.vref }, "") )
+    fmt.Println( strings.Join([]string{ (strings.Join([]string{ (strings.Join([]string{ (strings.Join([]string{ "Collected ",strconv.FormatInt(node_cnt, 10) }, ""))," nodes and " }, "")),strconv.FormatInt(text_cnt, 10) }, ""))," text nodes" }, "") )
     fmt.Println("Time for parsing the code:", time.Since(_start) )
     break;
   }

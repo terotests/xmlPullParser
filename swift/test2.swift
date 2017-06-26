@@ -259,30 +259,22 @@ let the_code : SourceCode = SourceCode(code_str : read_code)
 let p : XMLParser = XMLParser(code_module : the_code)
 do {
   let _start = CFAbsoluteTimeGetCurrent()
+  var node_cnt : Int = 0
+  var text_cnt : Int = 0
   while (p.pull()) {
-    let last : XMLNode = p.last()
-    print("-> pulled a new node " + last.vref)
+    /** unused:  let last : XMLNode = p.last()   **/ 
     let last_11 : XMLNode = p.last_finished!
     for ( _ , ch ) in last_11.children.enumerated() {
       if ( ch.value_type == 18 ) {
-        print("text : " + ch.string_value)
+        node_cnt = node_cnt + 1;
       } else {
-        print("child : " + ch.vref)
+        text_cnt = text_cnt + 1;
       }
-    }
-    for ( _ , attr ) in last_11.attrs.enumerated() {
-      print((attr.vref + " = ") + attr.string_value)
     }
   }
   let last_12 : XMLNode = p.last()
-  print("The children of the last node are " + last_12.vref)
-  for ( _ , ch_8 ) in last_12.children.enumerated() {
-    if ( ch_8.value_type == 18 ) {
-      print("text : " + ch_8.string_value)
-    } else {
-      print("child : " + ch_8.vref)
-    }
-  }
+  print("Last node was" + last_12.vref)
+  print(((("Collected " + String(node_cnt)) + " nodes and ") + String(text_cnt)) + " text nodes")
   print("Time for parsing the code:", CFAbsoluteTimeGetCurrent() - _start )
 }
 print("--- done --- ")

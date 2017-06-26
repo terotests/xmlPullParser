@@ -209,7 +209,7 @@ func r_write_text_file(pathName string, fileName string, txtData string)  {
         
 
         read_file        cmdReadFile@(optional):string (path:string filename:string) {
-            ; C++ https://www.reddit.com/r/learnprogramming/comments/3qotqr/how_can_i_read_an_entire_text_file_into_a_string/
+
             templates {
                 ranger (  "(read_file " (e 1) " " (e 2) ")" )
                 cpp ( "r_cpp_readFile( " (e 1) " , " (e 2) ")" (imp "<fstream>")
