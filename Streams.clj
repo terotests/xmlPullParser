@@ -33,6 +33,12 @@ systemclass  WritableStream {
 
 operators {
 
+    nullify item:void ( ref@(optional):T ) {
+        templates {
+            es6 ( "delete " (e 1 ) )
+        }  
+    }
+
     detach process:void ( code:block ) {
         templates {
             es6 ( "process.nextTick( () => {" nl I  (e 1) i nl "})" )

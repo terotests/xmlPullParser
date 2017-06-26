@@ -9,7 +9,8 @@ Enum XMLNodeType:int (
 )
 
 class XMLDataReady {
-  fn Data:void (last_node:XMLNode) {
+  fn Data:boolean (last_node:XMLNode) {
+    return false
   }
   fn Finished:void (last_node:XMLNode) {
   }
@@ -31,6 +32,9 @@ class XMLParser:void {
   def no_more_data:boolean false
   def inStream:ReadableStream
   def onReady@(weak):XMLDataReady
+
+  def total_bytes:int 0
+  def total_nodes:int 0 
 
   def buff:StreamChunk
   def len:int 0
@@ -149,7 +153,17 @@ class XMLParser:void {
       } {
         if( this.pull() ) {
           if last_finished {
-            this.onReady.Data( (unwrap last_finished) )
+            total_nodes = total_nodes + 1
+            if ( this.onReady.Data( (unwrap last_finished) ) ) {
+              ; remove the last finished node
+              if( last_finished.parent ) {
+                def last:XMLNode (unwrap last_finished)
+                def p:XMLNode (unwrap last.parent)
+                def idx:int (indexOf p.children last)
+                def removed:XMLNode (array_extract p.children idx)
+                (nullify removed.parent)
+              }
+            }
           }
         } {
           ask_more ( unwrap inStream )
@@ -165,6 +179,7 @@ class XMLParser:void {
       read (unwrap inStream) data:StreamChunk {
         has_data = true
         len = (length data)
+        total_bytes = total_bytes + len
         buff = data
         i = 0
         this.processData()

@@ -9,9 +9,11 @@ class myDataHandler {
   }
 
   fn Data:void (last_node:XMLNode) {
+    def remove_latest:boolean false
     switch last_node.value_type {
         case XMLNodeType.XMLNode {
-            print "read a new node " + last_node.vref
+            print "read a new node, removing it... " + last_node.vref
+            remove_latest = true
         }
         case XMLNodeType.XMLText {
             print "text : " + last_node.string_value
@@ -20,9 +22,10 @@ class myDataHandler {
     detach {
         parser.askMore(  this )
     }
+    return remove_latest
   }
   fn Finished:void (last_node:XMLNode) {
-    print "all data was read"
+    print "all data was read, total bytes processed = " + parser.total_bytes + ", total nodes = " + parser.total_nodes
   }
 }
 

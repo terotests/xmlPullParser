@@ -12,6 +12,7 @@ class XMLDataReady  {
   }
   
   Data(last_node ) {
+    return false;
   }
   
   Finished(last_node ) {
@@ -37,6 +38,8 @@ class XMLParser  {
     this.no_more_data = false;
     this.inStream;
     this.onReady;
+    this.total_bytes = 0;
+    this.total_nodes = 0;
     this.buff;
     this.len = 0;
     this.i = 0;
@@ -151,7 +154,16 @@ class XMLParser  {
       } else {
         if ( this.pull() ) {
           if ( typeof(this.last_finished) != "undefined" ) {
-            this.onReady.Data(this.last_finished);
+            this.total_nodes = this.total_nodes + 1;
+            if ( this.onReady.Data((this.last_finished)) ) {
+              if ( typeof(this.last_finished.parent) != "undefined" ) {
+                var last = this.last_finished
+                var p = last.parent
+                var idx = p.children.indexOf(last)
+                var removed = p.children.splice(idx, 1).pop()
+                delete removed.parent
+              }
+            }
           }
         } else {
           this.inStream.resume()
@@ -168,6 +180,7 @@ class XMLParser  {
         this.inStream.pause()
         this.has_data = true;
         this.len = data.length;
+        this.total_bytes = this.total_bytes + this.len;
         this.buff = data;
         this.i = 0;
         this.processData();
@@ -323,9 +336,11 @@ class myDataHandler  extends XMLDataReady {
   }
   
   Data(last_node ) {
+    var remove_latest = false
     switch (last_node.value_type ) { 
       case 1 : 
-        console.log("read a new node " + last_node.vref)
+        console.log("read a new node, removing it... " + last_node.vref)
+        remove_latest = true;
         break;
       case 2 : 
         console.log("text : " + last_node.string_value)
@@ -334,10 +349,11 @@ class myDataHandler  extends XMLDataReady {
     process.nextTick( () => {
       this.parser.askMore(this)
     })
+    return remove_latest;
   }
   
   Finished(last_node ) {
-    console.log("all data was read")
+    console.log((("all data was read, total bytes processed = " + this.parser.total_bytes) + ", total nodes = ") + this.parser.total_nodes)
   }
 }
 class streamTester  {

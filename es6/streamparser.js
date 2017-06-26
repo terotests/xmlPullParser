@@ -12,6 +12,7 @@ class XMLDataReady  {
   }
   
   Data(last_node ) {
+    return false;
   }
   
   Finished(last_node ) {
@@ -37,6 +38,8 @@ class XMLParser  {
     this.no_more_data = false;
     this.inStream;
     this.onReady;
+    this.total_bytes = 0;
+    this.total_nodes = 0;
     this.buff;
     this.len = 0;
     this.i = 0;
@@ -151,7 +154,16 @@ class XMLParser  {
       } else {
         if ( this.pull() ) {
           if ( typeof(this.last_finished) != "undefined" ) {
-            this.onReady.Data(this.last_finished);
+            this.total_nodes = this.total_nodes + 1;
+            if ( this.onReady.Data((this.last_finished)) ) {
+              if ( typeof(this.last_finished.parent) != "undefined" ) {
+                var last = this.last_finished
+                var p = last.parent
+                var idx = p.children.indexOf(last)
+                var removed = p.children.splice(idx, 1).pop()
+                delete removed.parent
+              }
+            }
           }
         } else {
           this.inStream.resume()
@@ -168,6 +180,7 @@ class XMLParser  {
         this.inStream.pause()
         this.has_data = true;
         this.len = data.length;
+        this.total_bytes = this.total_bytes + this.len;
         this.buff = data;
         this.i = 0;
         this.processData();
