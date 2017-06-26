@@ -2,8 +2,8 @@ Import "xmlStreamParser.clj"
 
 class myDataHandler {
   Extends(XMLDataReady)
-
   def parser:XMLParser
+
   Constructor(p:XMLParser) {
       parser = p
   }
@@ -28,9 +28,9 @@ class myDataHandler {
 
 class streamTester {
 
-    fn  read:void (fileName:string) {
+    fn read:void (fileName:string) {
         def inS:ReadableStream (create_read_stream (new File(fileName)))
-        def parser:XMLParser (new XMLParser(inS))
+        def parser:XMLParser (new XMLParser(inS) )
         def handler:myDataHandler (new myDataHandler( parser ))
         parser.askMore( handler )        
     }

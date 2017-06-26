@@ -10,10 +10,8 @@ Enum XMLNodeType:int (
 
 class XMLDataReady {
   fn Data:void (last_node:XMLNode) {
-    print "read a new node " + last_node.vref
   }
   fn Finished:void (last_node:XMLNode) {
-    print "all data was read"
   }
 }
 
@@ -28,6 +26,7 @@ class XMLNode:void {
 }
 class XMLParser:void {
 
+  def has_started:boolean false
   def has_data:boolean false
   def no_more_data:boolean false
   def inStream:ReadableStream
@@ -44,21 +43,8 @@ class XMLParser:void {
   def last_finished@(weak):XMLNode
   def tag_depth:int 0
 
-  Constructor (from:ReadableStream ) {
+  Constructor (from:ReadableStream) {
     inStream = from
-    read (unwrap inStream) data:StreamChunk {
-      has_data = true
-      len = (length data)
-      buff = data
-      i = 0
-      if onReady {
-        this.askMore( (unwrap onReady) )        
-      }
-    } {
-      no_more_data = true
-      len = 0
-      i = 0
-    }
   }
  
   fn parse_attributes:boolean () {
@@ -148,7 +134,28 @@ class XMLParser:void {
 
   }
 
-  fn askMore:void ( cb:XMLDataReady ) {
+  fn askMore:void (cb:XMLDataReady) {
+    this.onReady = cb
+    if (has_started == false) {
+      has_started = true
+      read (unwrap inStream) data:StreamChunk {
+        has_data = true
+        len = (length data)
+        buff = data
+        i = 0
+        if onReady {
+          this.askMore( (unwrap onReady) )        
+        }
+      } {
+        no_more_data = true
+        len = 0
+        i = 0
+        if onReady {
+          this.onReady.Finished( (unwrap last_finished) )     
+        }      
+      }
+      return
+    }
     if no_more_data {
       if onReady {
         if last_finished {
@@ -157,7 +164,6 @@ class XMLParser:void {
       }
       return
     }
-    this.onReady = cb
     if( has_data ) {
       if ( i >= (len - 1) ) {
         ask_more ( unwrap inStream )
@@ -167,7 +173,7 @@ class XMLParser:void {
             this.onReady.Data( (unwrap last_finished) )
           }
         } {
-          this.onReady.Finished( (unwrap last_finished) )
+          ask_more ( unwrap inStream )
         }
       }
     } 

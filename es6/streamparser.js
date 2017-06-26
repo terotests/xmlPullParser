@@ -12,11 +12,9 @@ class XMLDataReady  {
   }
   
   Data(last_node ) {
-    console.log("read a new node " + last_node.vref)
   }
   
   Finished(last_node ) {
-    console.log("all data was read")
   }
 }
 class XMLNode  {
@@ -34,6 +32,7 @@ class XMLNode  {
 class XMLParser  {
   
   constructor(from  ) {
+    this.has_started = false;
     this.has_data = false;
     this.no_more_data = false;
     this.inStream;
@@ -49,21 +48,6 @@ class XMLParser  {
     this.last_finished;
     this.tag_depth = 0;
     this.inStream = from;
-    this.inStream.on('data', (data) => {
-      this.inStream.pause()
-      this.has_data = true;
-      this.len = data.length;
-      this.buff = data;
-      this.i = 0;
-      if ( typeof(this.onReady) != "undefined" ) {
-        this.askMore(this.onReady);
-      }
-    });
-    this.inStream.on('end', () => {
-      this.no_more_data = true;
-      this.len = 0;
-      this.i = 0;
-    });
   }
   
   parse_attributes() {
@@ -153,6 +137,29 @@ class XMLParser  {
   }
   
   askMore(cb ) {
+    this.onReady = cb;
+    if ( this.has_started == false ) {
+      this.has_started = true;
+      this.inStream.on('data', (data) => {
+        this.inStream.pause()
+        this.has_data = true;
+        this.len = data.length;
+        this.buff = data;
+        this.i = 0;
+        if ( typeof(this.onReady) != "undefined" ) {
+          this.askMore(this.onReady);
+        }
+      });
+      this.inStream.on('end', () => {
+        this.no_more_data = true;
+        this.len = 0;
+        this.i = 0;
+        if ( typeof(this.onReady) != "undefined" ) {
+          this.onReady.Finished(this.last_finished);
+        }
+      });
+      return;
+    }
     if ( this.no_more_data ) {
       if ( typeof(this.onReady) != "undefined" ) {
         if ( typeof(this.last_finished) != "undefined" ) {
@@ -161,7 +168,6 @@ class XMLParser  {
       }
       return;
     }
-    this.onReady = cb;
     if ( this.has_data ) {
       if ( this.i >= (this.len - 1) ) {
         this.inStream.resume()
@@ -171,7 +177,7 @@ class XMLParser  {
             this.onReady.Data(this.last_finished);
           }
         } else {
-          this.onReady.Finished(this.last_finished);
+          this.inStream.resume()
         }
       }
     }
