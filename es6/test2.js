@@ -1,7 +1,6 @@
 
 class SourceCode  {
-  
-  constructor(code_str  ) {
+  constructor(code_str ) {
     this.code = "";
     this.sp = 0;     /** note: unused */
     this.ep = 0;     /** note: unused */
@@ -9,8 +8,7 @@ class SourceCode  {
   }
 }
 class XMLNode  {
-  
-  constructor(source ,start ,end  ) {
+  constructor(source, start, end ) {
     this.code;
     this.sp = 0;
     this.ep = 0;
@@ -25,14 +23,12 @@ class XMLNode  {
     this.sp = start;
     this.ep = end;
   }
-  
   getString() {
     return this.code.code.substring(this.sp, this.ep );
   }
 }
 class XMLParser  {
-  
-  constructor(code_module  ) {
+  constructor(code_module ) {
     this.code;
     this.buff;
     this.len = 0;
@@ -49,7 +45,6 @@ class XMLParser  {
     this.len = (this.buff).length;
     this.i = 0;
   }
-  
   parse_attributes() {
     var s = this.buff
     var last_i = 0
@@ -128,11 +123,9 @@ class XMLParser  {
     }
     return do_break;
   }
-  
   last() {
     return this.last_finished;
   }
-  
   pull() {
     var s_4 = this.buff
     var c_4 = 0
@@ -258,34 +251,34 @@ class XMLParser  {
   }
 }
 class tester  {
-  
   constructor( ) {
   }
 }
-
-
 /* static JavaSript main routine */
-console.log("Testing XML parser")
-var read_code = ((require('fs').readFileSync( process.cwd() + '/' + "." + '/' + "testCode.xml" , 'utf8')))
-var the_code = new SourceCode(read_code)
-var p = new XMLParser(the_code)
-console.time("Time for parsing the code:");
-var node_cnt = 0
-var text_cnt = 0
-while (p.pull()) {
-  /** unused:  var last = p.last()   **/ 
-  var last_11 = p.last_finished
-  for ( var i = 0; i < last_11.children.length; i++) {
-    var ch = last_11.children[i];
-    if ( ch.value_type == 18 ) {
-      node_cnt = node_cnt + 1;
-    } else {
-      text_cnt = text_cnt + 1;
+function __js_main() {
+  console.log("Testing XML parser")
+  var read_code = ((require('fs').readFileSync( process.cwd() + '/' + "." + '/' + "testCode.xml" , 'utf8')))
+  var the_code = new SourceCode(read_code)
+  var p = new XMLParser(the_code)
+  console.time("Time for parsing the code:");
+  var node_cnt = 0
+  var text_cnt = 0
+  while (p.pull()) {
+    /** unused:  var last = p.last()   **/ 
+    var last_11 = p.last_finished
+    for ( var i = 0; i < last_11.children.length; i++) {
+      var ch = last_11.children[i];
+      if ( ch.value_type == 18 ) {
+        node_cnt = node_cnt + 1;
+      } else {
+        text_cnt = text_cnt + 1;
+      }
     }
   }
+  var last_12 = p.last()
+  console.log("Last node was" + last_12.vref)
+  console.log(((("Collected " + node_cnt) + " nodes and ") + text_cnt) + " text nodes")
+  console.timeEnd("Time for parsing the code:");
+  console.log("--- done --- ")
 }
-var last_12 = p.last()
-console.log("Last node was" + last_12.vref)
-console.log(((("Collected " + node_cnt) + " nodes and ") + text_cnt) + " text nodes")
-console.timeEnd("Time for parsing the code:");
-console.log("--- done --- ")
+__js_main();

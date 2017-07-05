@@ -1,23 +1,42 @@
 import Foundation
 import CoreFoundation
-class SourceCode { 
+func ==(l: SourceCode, r: SourceCode) -> Bool {
+  return l == r
+}
+class SourceCode : Equatable  { 
+  // code
   var code : String = ""
+  // sp
   var sp : Int = 0     /** note: unused */
+  // ep
   var ep : Int = 0     /** note: unused */
   init(code_str : String ) {
     code = code_str;
   }
 }
-class XMLNode { 
+func ==(l: XMLNode, r: XMLNode) -> Bool {
+  return l == r
+}
+class XMLNode : Equatable  { 
+  // code
   var code : SourceCode?
+  // sp
   var sp : Int = 0
+  // ep
   var ep : Int = 0
+  // vref
   var vref : String = ""
+  // ns
   var ns : [String] = [String]()     /** note: unused */
+  // value_type
   var value_type : Int = 0
+  // string_value
   var string_value : String = ""
+  // children
   var children : [XMLNode] = [XMLNode]()
+  // attrs
   var attrs : [XMLNode] = [XMLNode]()
+  // parent
   var parent : XMLNode?
   init(source : SourceCode, start : Int, end : Int ) {
     code = source;
@@ -28,17 +47,31 @@ class XMLNode {
     return code!.code[code!.code.index(code!.code.startIndex, offsetBy:sp)..<code!.code.index(code!.code.startIndex, offsetBy:ep)];
   }
 }
-class XMLParser { 
+func ==(l: XMLParser, r: XMLParser) -> Bool {
+  return l == r
+}
+class XMLParser : Equatable  { 
+  // code
   var code : SourceCode?
+  // buff
   var buff : [UInt8]?
+  // len
   var len : Int = 0
+  // i
   var i : Int = 0
+  // parents
   var parents : [XMLNode] = [XMLNode]()
+  // next
   var next : XMLNode?     /** note: unused */
+  // rootNode
   var rootNode : XMLNode?
+  // last_parent_safe
   var last_parent_safe : XMLNode?
+  // curr_node
   var curr_node : XMLNode?
+  // last_finished
   var last_finished : XMLNode?
+  // tag_depth
   var tag_depth : Int = 0
   init(code_module : SourceCode ) {
     buff = Array(code_module.code.utf8);
@@ -251,38 +284,45 @@ class XMLParser {
     return true;
   }
 }
-class tester { 
+func ==(l: tester, r: tester) -> Bool {
+  return l == r
 }
-print("Testing XML parser")
-let read_code : String = "<View padding=\"2px\" margin=\"3px\" background-color=\"#fef6f2\" >\r\n    <View width=\"100%\" padding=\"10px\" id=\"stats1\" >\r\n        <View padding=\"20px\" width=\"dss\" >\r\n        Some text here...\r\n        </View>\r\n        <View padding=\"20px\" width=\"dss\" >\r\n        Some text here...\r\n        </View>\r\n    </View>\r\n</View>"
-let the_code : SourceCode = SourceCode(code_str : read_code)
-let p : XMLParser = XMLParser(code_module : the_code)
-do {
-  let _start = CFAbsoluteTimeGetCurrent()
-  while (p.pull()) {
-    let last : XMLNode = p.last()
-    print("-> pulled a new node " + last.vref)
-    let last_11 : XMLNode = p.last_finished!
-    for ( _ , ch ) in last_11.children.enumerated() {
-      if ( ch.value_type == 18 ) {
-        print("text : " + ch.string_value)
-      } else {
-        print("child : " + ch.vref)
+class tester : Equatable  { 
+}
+func __main__swift() {
+  print("Testing XML parser")
+  let read_code : String = "<View padding=\"2px\" margin=\"3px\" background-color=\"#fef6f2\" >\r\n    <View width=\"100%\" padding=\"10px\" id=\"stats1\" >\r\n        <View padding=\"20px\" width=\"dss\" >\r\n        Some text here...\r\n        </View>\r\n        <View padding=\"20px\" width=\"dss\" >\r\n        Some text here...\r\n        </View>\r\n    </View>\r\n</View>"
+  let the_code : SourceCode = SourceCode(code_str : read_code)
+  let p : XMLParser = XMLParser(code_module : the_code)
+  do {
+    let _start = CFAbsoluteTimeGetCurrent()
+    while (p.pull()) {
+      let last : XMLNode = p.last()
+      print("-> pulled a new node " + last.vref)
+      let last_11 : XMLNode = p.last_finished!
+      for ( _ , ch ) in last_11.children.enumerated() {
+        if ( ch.value_type == 18 ) {
+          print("text : " + ch.string_value)
+        } else {
+          print("child : " + ch.vref)
+        }
+      }
+      for ( _ , attr ) in last_11.attrs.enumerated() {
+        print((attr.vref + " = ") + attr.string_value)
       }
     }
-    for ( _ , attr ) in last_11.attrs.enumerated() {
-      print((attr.vref + " = ") + attr.string_value)
+    let last_12 : XMLNode = p.last()
+    print("The children of the last node are " + last_12.vref)
+    for ( _ , ch_8 ) in last_12.children.enumerated() {
+      if ( ch_8.value_type == 18 ) {
+        print("text : " + ch_8.string_value)
+      } else {
+        print("child : " + ch_8.vref)
+      }
     }
+    print("Time for parsing the code:", CFAbsoluteTimeGetCurrent() - _start )
   }
-  let last_12 : XMLNode = p.last()
-  print("The children of the last node are " + last_12.vref)
-  for ( _ , ch_8 ) in last_12.children.enumerated() {
-    if ( ch_8.value_type == 18 ) {
-      print("text : " + ch_8.string_value)
-    } else {
-      print("child : " + ch_8.vref)
-    }
-  }
-  print("Time for parsing the code:", CFAbsoluteTimeGetCurrent() - _start )
+  print("--- done --- ")
 }
-print("--- done --- ")
+// call the main function
+__main__swift()

@@ -6,7 +6,7 @@ class SourceCode {
   var $ep;
   
   function __construct( $code_str  ) {
-    $this->code = '';
+    $this->code = "";
     $this->sp = 0;     /** note: unused */
     $this->ep = 0;     /** note: unused */
     $this->code = $code_str;
@@ -28,10 +28,10 @@ class XMLNode {
     $this->code;
     $this->sp = 0;
     $this->ep = 0;
-    $this->vref = '';
+    $this->vref = "";
     $this->ns = array();     /** note: unused */
     $this->value_type = 0;
-    $this->string_value = '';
+    $this->string_value = "";
     $this->children = array();
     $this->attrs = array();
     $this->parent;
@@ -79,7 +79,7 @@ class XMLParser {
     $s = $this->buff;
     $last_i = 0;
     $do_break = false;
-    /** unused:  $attr_name = ''   **/ ;
+    /** unused:  $attr_name = ""   **/ ;
     $sp = $this->i;
     $ep = $this->i;
     $c = 0;
@@ -290,8 +290,8 @@ class tester {
 }
 
 /* static PHP main routine */
-echo( 'Testing XML parser' . "\n");
-$read_code = (file_get_contents('.' . "/" . 'testCode.xml') );
+echo( "Testing XML parser" . "\n");
+$read_code = (file_get_contents("." . "/" . "testCode.xml") );
 $the_code =  new SourceCode($read_code);
 $p =  new XMLParser($the_code);
 $time_start = microtime(true);
@@ -310,8 +310,8 @@ while ($p->pull()) {
   }
 }
 $last_12 = $p->last();
-echo( 'Last node was' . $last_12->vref . "\n");
-echo( ((('Collected ' . $node_cnt) . ' nodes and ') . $text_cnt) . ' text nodes' . "\n");
+echo( "Last node was" . $last_12->vref . "\n");
+echo( ((("Collected " . $node_cnt) . " nodes and ") . $text_cnt) . " text nodes" . "\n");
 $time_end = microtime(true);
-echo('Time for parsing the code:'.($time_end - $time_start)."\n");
-echo( '--- done --- ' . "\n");
+echo("Time for parsing the code:".($time_end - $time_start)."\n");
+echo( "--- done --- " . "\n");

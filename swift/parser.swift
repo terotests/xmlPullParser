@@ -1,22 +1,41 @@
 import Foundation
-class SourceCode { 
+func ==(l: SourceCode, r: SourceCode) -> Bool {
+  return l == r
+}
+class SourceCode : Equatable  { 
+  // code
   var code : String = ""
+  // sp
   var sp : Int = 0     /** note: unused */
+  // ep
   var ep : Int = 0     /** note: unused */
   init(code_str : String ) {
     code = code_str;
   }
 }
-class XMLNode { 
+func ==(l: XMLNode, r: XMLNode) -> Bool {
+  return l == r
+}
+class XMLNode : Equatable  { 
+  // code
   var code : SourceCode?
+  // sp
   var sp : Int = 0
+  // ep
   var ep : Int = 0
+  // vref
   var vref : String = ""
+  // ns
   var ns : [String] = [String]()     /** note: unused */
+  // value_type
   var value_type : Int = 0
+  // string_value
   var string_value : String = ""
+  // children
   var children : [XMLNode] = [XMLNode]()
+  // attrs
   var attrs : [XMLNode] = [XMLNode]()
+  // parent
   var parent : XMLNode?
   init(source : SourceCode, start : Int, end : Int ) {
     code = source;
@@ -27,17 +46,31 @@ class XMLNode {
     return code!.code[code!.code.index(code!.code.startIndex, offsetBy:sp)..<code!.code.index(code!.code.startIndex, offsetBy:ep)];
   }
 }
-class XMLParser { 
+func ==(l: XMLParser, r: XMLParser) -> Bool {
+  return l == r
+}
+class XMLParser : Equatable  { 
+  // code
   var code : SourceCode?
+  // buff
   var buff : [UInt8]?
+  // len
   var len : Int = 0
+  // i
   var i : Int = 0
+  // parents
   var parents : [XMLNode] = [XMLNode]()
+  // next
   var next : XMLNode?     /** note: unused */
+  // rootNode
   var rootNode : XMLNode?
+  // last_parent_safe
   var last_parent_safe : XMLNode?
+  // curr_node
   var curr_node : XMLNode?
+  // last_finished
   var last_finished : XMLNode?
+  // tag_depth
   var tag_depth : Int = 0
   init(code_module : SourceCode ) {
     buff = Array(code_module.code.utf8);

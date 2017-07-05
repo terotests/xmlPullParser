@@ -1,7 +1,6 @@
 
 class SourceCode  {
-  
-  constructor(code_str  ) {
+  constructor(code_str ) {
     this.code = "";
     this.sp = 0;     /** note: unused */
     this.ep = 0;     /** note: unused */
@@ -9,8 +8,7 @@ class SourceCode  {
   }
 }
 class XMLNode  {
-  
-  constructor(source ,start ,end  ) {
+  constructor(source, start, end ) {
     this.code;
     this.sp = 0;
     this.ep = 0;
@@ -25,14 +23,12 @@ class XMLNode  {
     this.sp = start;
     this.ep = end;
   }
-  
   getString() {
     return this.code.code.substring(this.sp, this.ep );
   }
 }
 class XMLParser  {
-  
-  constructor(code_module  ) {
+  constructor(code_module ) {
     this.code;
     this.buff;
     this.len = 0;
@@ -49,7 +45,6 @@ class XMLParser  {
     this.len = (this.buff).length;
     this.i = 0;
   }
-  
   parse_attributes() {
     var s = this.buff
     var last_i = 0
@@ -128,11 +123,9 @@ class XMLParser  {
     }
     return do_break;
   }
-  
   last() {
     return this.last_finished;
   }
-  
   pull() {
     var s_4 = this.buff
     var c_4 = 0

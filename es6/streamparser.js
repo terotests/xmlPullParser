@@ -1,25 +1,20 @@
 
 class InputFile  {
-  
-  constructor(fName  ) {
+  constructor(fName ) {
     this.filename = "";
     this.filename = fName;
   }
 }
 class XMLDataReady  {
-  
   constructor( ) {
   }
-  
-  Data(last_node ) {
+  Data(last_node) {
     return false;
   }
-  
-  Finished(last_node ) {
+  Finished(last_node) {
   }
 }
 class XMLNode  {
-  
   constructor( ) {
     this.vref = "";
     this.ns = [];     /** note: unused */
@@ -31,8 +26,7 @@ class XMLNode  {
   }
 }
 class XMLParser  {
-  
-  constructor(from  ) {
+  constructor(from ) {
     this.has_started = false;
     this.has_data = false;
     this.no_more_data = false;
@@ -53,7 +47,6 @@ class XMLParser  {
     this.inStream = from;
     this.i = 0;
   }
-  
   parse_attributes() {
     var s = this.buff
     var last_i = 0
@@ -132,14 +125,11 @@ class XMLParser  {
     }
     return do_break;
   }
-  
   last() {
     return this.last_finished;
   }
-  
   getMoreData() {
   }
-  
   processData() {
     if ( this.no_more_data ) {
       if ( typeof(this.onReady) != "undefined" ) {
@@ -172,8 +162,7 @@ class XMLParser  {
       }
     }
   }
-  
-  askMore(cb ) {
+  askMore(cb) {
     this.onReady = cb;
     if ( this.has_started == false ) {
       this.has_started = true;
@@ -198,7 +187,6 @@ class XMLParser  {
     }
     this.processData();
   }
-  
   pull() {
     var s_4 = this.buff
     var c_4 = 0
