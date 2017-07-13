@@ -4,11 +4,8 @@ func ==(l: SourceCode, r: SourceCode) -> Bool {
   return l == r
 }
 class SourceCode : Equatable  { 
-  // code
   var code : String = ""
-  // sp
   var sp : Int = 0     /** note: unused */
-  // ep
   var ep : Int = 0     /** note: unused */
   init(code_str : String ) {
     code = code_str;
@@ -18,25 +15,15 @@ func ==(l: XMLNode, r: XMLNode) -> Bool {
   return l == r
 }
 class XMLNode : Equatable  { 
-  // code
   var code : SourceCode?
-  // sp
   var sp : Int = 0
-  // ep
   var ep : Int = 0
-  // vref
   var vref : String = ""
-  // ns
   var ns : [String] = [String]()     /** note: unused */
-  // value_type
   var value_type : Int = 0
-  // string_value
   var string_value : String = ""
-  // children
   var children : [XMLNode] = [XMLNode]()
-  // attrs
   var attrs : [XMLNode] = [XMLNode]()
-  // parent
   var parent : XMLNode?
   init(source : SourceCode, start : Int, end : Int ) {
     code = source;
@@ -51,32 +38,21 @@ func ==(l: XMLParser, r: XMLParser) -> Bool {
   return l == r
 }
 class XMLParser : Equatable  { 
-  // code
   var code : SourceCode?
-  // buff
   var buff : [UInt8]?
-  // len
-  var len : Int = 0
-  // i
+  var __len : Int = 0
   var i : Int = 0
-  // parents
   var parents : [XMLNode] = [XMLNode]()
-  // next
   var next : XMLNode?     /** note: unused */
-  // rootNode
   var rootNode : XMLNode?
-  // last_parent_safe
   var last_parent_safe : XMLNode?
-  // curr_node
   var curr_node : XMLNode?
-  // last_finished
   var last_finished : XMLNode?
-  // tag_depth
   var tag_depth : Int = 0
   init(code_module : SourceCode ) {
     buff = Array(code_module.code.utf8);
     code = code_module;
-    len = (buff!).count;
+    __len = (buff!).count;
     i = 0;
   }
   func parse_attributes() -> Bool {
@@ -90,14 +66,14 @@ class XMLParser : Equatable  {
     var cc1 : UInt8 = 0
     var cc2 : UInt8 = 0
     cc1 = s[i];
-    while (i < len) {
+    while (i < __len) {
       last_i = i;
-      while ((i < len) && ((s[i]) <= 32)) {
+      while ((i < __len) && ((s[i]) <= 32)) {
         i = 1 + i;
       }
       cc1 = s[i];
       cc2 = s[(i + 1)];
-      if ( i >= len ) {
+      if ( i >= __len ) {
         break;
       }
       if ( cc1 == (62) ) {
@@ -110,7 +86,7 @@ class XMLParser : Equatable  {
       sp = i;
       ep = i;
       c = s[i];
-      while ((i < len) && ((((((c >= 65) && (c <= 90)) || ((c >= 97) && (c <= 122))) || ((c >= 48) && (c <= 57))) || (c == (95))) || (c == (45)))) {
+      while ((i < __len) && ((((((c >= 65) && (c <= 90)) || ((c >= 97) && (c <= 122))) || ((c >= 48) && (c <= 57))) || (c == (95))) || (c == (45)))) {
         i = 1 + i;
         c = s[i];
       }
@@ -118,17 +94,17 @@ class XMLParser : Equatable  {
       let an_sp : Int = sp
       let an_ep : Int = i
       c = s[i];
-      while ((i < len) && (c != (61))) {
+      while ((i < __len) && (c != (61))) {
         i = 1 + i;
         c = s[i];
       }
       if ( c == (61) ) {
         i = 1 + i;
       }
-      while ((i < len) && ((s[i]) <= 32)) {
+      while ((i < __len) && ((s[i]) <= 32)) {
         i = 1 + i;
       }
-      if ( i >= len ) {
+      if ( i >= __len ) {
         break;
       }
       c = s[i];
@@ -137,12 +113,12 @@ class XMLParser : Equatable  {
         sp = i;
         ep = i;
         c = s[i];
-        while ((i < len) && (c != 34)) {
+        while ((i < __len) && (c != 34)) {
           i = 1 + i;
           c = s[i];
         }
         ep = i;
-        if ( (i < len) && (ep > sp) ) {
+        if ( (i < __len) && (ep > sp) ) {
           let new_attr : XMLNode = XMLNode(source : code!, start : an_sp, end : ep)
           new_attr.value_type = 19;
           new_attr.vref = String(data: Data(bytes:s[an_sp ..< (an_ep + 1)]), encoding: .utf8)!;
@@ -161,31 +137,31 @@ class XMLParser : Equatable  {
     return last_finished!;
   }
   func pull() -> Bool {
-    let s_4 : [UInt8] = buff!
-    var c_4 : UInt8 = 0
+    let s : [UInt8] = buff!
+    var c : UInt8 = 0
     /** unused:  let next_c : UInt8 = 0   **/ 
     /** unused:  let fc : UInt8 = 0   **/ 
     /** unused:  let new_node : XMLNode?   **/ 
-    var sp_4 : Int = i
-    var ep_4 : Int = i
-    var last_i_4 : Int = 0
-    var cc1_4 : UInt8 = 0
-    var cc2_4 : UInt8 = 0
-    while (i < len) {
+    var sp : Int = i
+    var ep : Int = i
+    var last_i : Int = 0
+    var cc1 : UInt8 = 0
+    var cc2 : UInt8 = 0
+    while (i < __len) {
       last_finished = curr_node;
-      last_i_4 = i;
-      if ( i >= (len - 1) ) {
+      last_i = i;
+      if ( i >= (__len - 1) ) {
         return false;
       }
-      cc1_4 = s_4[i];
-      cc2_4 = s_4[(i + 1)];
-      if ( cc1_4 == (62) ) {
+      cc1 = s[i];
+      cc2 = s[(i + 1)];
+      if ( cc1 == (62) ) {
         i = i + 1;
-        cc1_4 = s_4[i];
-        cc2_4 = s_4[(i + 1)];
+        cc1 = s[i];
+        cc2 = s[(i + 1)];
         continue;
       }
-      if ( ((47) == cc1_4) && (cc2_4 == (62)) ) {
+      if ( ((47) == cc1) && (cc2 == (62)) ) {
         tag_depth = tag_depth - 1;
         i = i + 2;
         last_finished = curr_node;
@@ -199,84 +175,84 @@ class XMLParser : Equatable  {
         curr_node = last_parent;
         return true;
       }
-      if ( i >= len ) {
+      if ( i >= __len ) {
         return false;
       }
-      if ( ((60) == cc1_4) && (cc2_4 == (47)) ) {
+      if ( ((60) == cc1) && (cc2 == (47)) ) {
         tag_depth = tag_depth - 1;
         i = i + 2;
-        sp_4 = i;
-        ep_4 = i;
-        c_4 = s_4[i];
-        while (((i < len) && (c_4 > 32)) && (c_4 != (62))) {
+        sp = i;
+        ep = i;
+        c = s[i];
+        while (((i < __len) && (c > 32)) && (c != (62))) {
           i = 1 + i;
-          c_4 = s_4[i];
+          c = s[i];
         }
-        ep_4 = i;
+        ep = i;
         parents.removeLast();
-        let p_cnt_8 : Int = parents.count
-        if ( 0 == p_cnt_8 ) {
+        let p_cnt_1 : Int = parents.count
+        if ( 0 == p_cnt_1 ) {
           return false;
         }
-        let last_parent_8 : XMLNode = parents[(p_cnt_8 - 1)]
+        let last_parent_1 : XMLNode = parents[(p_cnt_1 - 1)]
         last_finished = curr_node;
-        last_parent_safe = last_parent_8;
-        curr_node = last_parent_8;
+        last_parent_safe = last_parent_1;
+        curr_node = last_parent_1;
         return true;
       }
-      if ( cc1_4 == (60) ) {
+      if ( cc1 == (60) ) {
         i = i + 1;
-        sp_4 = i;
-        ep_4 = i;
-        c_4 = s_4[i];
-        while (((i < len) && (c_4 != (62))) && (((((((c_4 >= 65) && (c_4 <= 90)) || ((c_4 >= 97) && (c_4 <= 122))) || ((c_4 >= 48) && (c_4 <= 57))) || (c_4 == 95)) || (c_4 == 46)) || (c_4 == 64))) {
+        sp = i;
+        ep = i;
+        c = s[i];
+        while (((i < __len) && (c != (62))) && (((((((c >= 65) && (c <= 90)) || ((c >= 97) && (c <= 122))) || ((c >= 48) && (c <= 57))) || (c == 95)) || (c == 46)) || (c == 64))) {
           i = 1 + i;
-          c_4 = s_4[i];
+          c = s[i];
         }
-        ep_4 = i;
-        let new_tag : String = String(data: Data(bytes:s_4[sp_4 ..< ep_4]), encoding: .utf8)!
+        ep = i;
+        let new_tag : String = String(data: Data(bytes:s[sp ..< ep]), encoding: .utf8)!
         if ( curr_node == nil ) {
-          let new_rnode : XMLNode = XMLNode(source : code!, start : sp_4, end : ep_4)
+          let new_rnode : XMLNode = XMLNode(source : code!, start : sp, end : ep)
           new_rnode.vref = new_tag;
           new_rnode.value_type = 17;
           rootNode = new_rnode;
           parents.append(new_rnode)
           curr_node = new_rnode;
         } else {
-          let new_node_10 : XMLNode = XMLNode(source : code!, start : sp_4, end : ep_4)
-          new_node_10.vref = new_tag;
-          new_node_10.value_type = 17;
-          curr_node!.children.append(new_node_10)
-          parents.append(new_node_10)
-          new_node_10.parent = curr_node;
-          curr_node = new_node_10;
+          let new_node_2 : XMLNode = XMLNode(source : code!, start : sp, end : ep)
+          new_node_2.vref = new_tag;
+          new_node_2.value_type = 17;
+          curr_node!.children.append(new_node_2)
+          parents.append(new_node_2)
+          new_node_2.parent = curr_node;
+          curr_node = new_node_2;
         }
-        if ( c_4 == (47) ) {
+        if ( c == (47) ) {
           continue;
         }
         _ = self.parse_attributes()
         continue;
       }
       if ( curr_node != nil  ) {
-        sp_4 = i;
-        ep_4 = i;
-        c_4 = s_4[i];
-        while ((i < len) && (c_4 != (60))) {
+        sp = i;
+        ep = i;
+        c = s[i];
+        while ((i < __len) && (c != (60))) {
           i = 1 + i;
-          c_4 = s_4[i];
+          c = s[i];
         }
-        ep_4 = i;
-        if ( ep_4 > sp_4 ) {
-          let new_node_15 : XMLNode = XMLNode(source : code!, start : sp_4, end : ep_4)
-          new_node_15.string_value = String(data: Data(bytes:s_4[sp_4 ..< ep_4]), encoding: .utf8)!;
-          new_node_15.value_type = 18;
-          curr_node!.children.append(new_node_15)
+        ep = i;
+        if ( ep > sp ) {
+          let new_node_3 : XMLNode = XMLNode(source : code!, start : sp, end : ep)
+          new_node_3.string_value = String(data: Data(bytes:s[sp ..< ep]), encoding: .utf8)!;
+          new_node_3.value_type = 18;
+          curr_node!.children.append(new_node_3)
         }
       }
-      if ( last_i_4 == i ) {
+      if ( last_i == i ) {
         i = 1 + i;
       }
-      if ( i >= (len - 1) ) {
+      if ( i >= (__len - 1) ) {
         return false;
       }
     }
@@ -299,25 +275,25 @@ func __main__swift() {
     while (p.pull()) {
       let last : XMLNode = p.last()
       print("-> pulled a new node " + last.vref)
-      let last_11 : XMLNode = p.last_finished!
-      for ( _ , ch ) in last_11.children.enumerated() {
+      let last_1 : XMLNode = p.last_finished!
+      for ( _ , ch ) in last_1.children.enumerated() {
         if ( ch.value_type == 18 ) {
           print("text : " + ch.string_value)
         } else {
           print("child : " + ch.vref)
         }
       }
-      for ( _ , attr ) in last_11.attrs.enumerated() {
+      for ( _ , attr ) in last_1.attrs.enumerated() {
         print((attr.vref + " = ") + attr.string_value)
       }
     }
-    let last_12 : XMLNode = p.last()
-    print("The children of the last node are " + last_12.vref)
-    for ( _ , ch_8 ) in last_12.children.enumerated() {
-      if ( ch_8.value_type == 18 ) {
-        print("text : " + ch_8.string_value)
+    let last_2 : XMLNode = p.last()
+    print("The children of the last node are " + last_2.vref)
+    for ( _ , ch_1 ) in last_2.children.enumerated() {
+      if ( ch_1.value_type == 18 ) {
+        print("text : " + ch_1.string_value)
       } else {
-        print("child : " + ch_8.vref)
+        print("child : " + ch_1.vref)
       }
     }
     print("Time for parsing the code:", CFAbsoluteTimeGetCurrent() - _start )

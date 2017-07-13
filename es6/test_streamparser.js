@@ -1,71 +1,62 @@
 
 class InputFile  {
-  constructor(fName ) {
+  constructor(fName) {
     this.filename = "";
     this.filename = fName;
   }
 }
 class XMLDataReady  {
-  constructor( ) {
+  constructor() {
   }
-  Data(last_node) {
+  Data (last_node) {
     return false;
   }
-  Finished(last_node) {
+  Finished (last_node) {
   }
 }
 class XMLNode  {
-  constructor( ) {
+  constructor() {
     this.vref = "";
     this.ns = [];     /** note: unused */
     this.value_type = 0;
     this.string_value = "";
     this.children = [];
     this.attrs = [];
-    this.parent;
   }
 }
 class XMLParser  {
-  constructor(from ) {
+  constructor(from) {
     this.has_started = false;
     this.has_data = false;
     this.no_more_data = false;
-    this.inStream;
-    this.onReady;
     this.total_bytes = 0;
     this.total_nodes = 0;
-    this.buff;
-    this.len = 0;
+    this.__len = 0;
     this.i = 0;
     this.parents = [];
-    this.next;     /** note: unused */
-    this.rootNode;
-    this.last_parent_safe;
-    this.curr_node;
-    this.last_finished;
     this.tag_depth = 0;
     this.inStream = from;
     this.i = 0;
   }
-  parse_attributes() {
-    var s = this.buff
-    var last_i = 0
-    var do_break = false
-    /** unused:  var attr_name = ""   **/ 
-    var sp = this.i
-    var ep = this.i
-    var c = 0
-    var cc1 = 0
-    var cc2 = 0
+  parse_attributes () {
+    const s = this.buff;
+    let last_i = 0;
+    const do_break = false;
+    /** unused:  const attr_name = ""   **/ 
+    let sp = this.i;
+    let ep = this.i;
+    let c = 0;
+    let cc1 = 0;
+    let cc2 = 0;
     cc1 = s[this.i];
-    while (this.i < this.len) {
+    while (this.i < this.__len) {
       last_i = this.i;
-      while ((this.i < this.len) && ((s[this.i]) <= 32)) {
+      while ((this.i < this.__len) && ((s[this.i]) <= 32)) {
         this.i = 1 + this.i;
       }
       cc1 = s[this.i];
       cc2 = s[(this.i + 1)];
-      if ( this.i >= this.len ) {
+      if ( this.i >= this.__len ) {
         break;
       }
       if ( cc1 == (62) ) {
@@ -78,25 +69,25 @@ class XMLParser  {
       sp = this.i;
       ep = this.i;
       c = s[this.i];
-      while ((this.i < this.len) && ((((((c >= 65) && (c <= 90)) || ((c >= 97) && (c <= 122))) || ((c >= 48) && (c <= 57))) || (c == (95))) || (c == (45)))) {
+      while ((this.i < this.__len) && ((((((c >= 65) && (c <= 90)) || ((c >= 97) && (c <= 122))) || ((c >= 48) && (c <= 57))) || (c == (95))) || (c == (45)))) {
         this.i = 1 + this.i;
         c = s[this.i];
       }
       this.i = this.i - 1;
-      var an_sp = sp
-      var an_ep = this.i
+      const an_sp = sp;
+      const an_ep = this.i;
       c = s[this.i];
-      while ((this.i < this.len) && (c != (61))) {
+      while ((this.i < this.__len) && (c != (61))) {
         this.i = 1 + this.i;
         c = s[this.i];
       }
       if ( c == (61) ) {
         this.i = 1 + this.i;
       }
-      while ((this.i < this.len) && ((s[this.i]) <= 32)) {
+      while ((this.i < this.__len) && ((s[this.i]) <= 32)) {
         this.i = 1 + this.i;
       }
-      if ( this.i >= this.len ) {
+      if ( this.i >= this.__len ) {
         break;
       }
       c = s[this.i];
@@ -105,13 +96,13 @@ class XMLParser  {
         sp = this.i;
         ep = this.i;
         c = s[this.i];
-        while ((this.i < this.len) && (c != 34)) {
+        while ((this.i < this.__len) && (c != 34)) {
           this.i = 1 + this.i;
           c = s[this.i];
         }
         ep = this.i;
-        if ( (this.i < this.len) && (ep > sp) ) {
-          var new_attr = new XMLNode()
+        if ( (this.i < this.__len) && (ep > sp) ) {
+          const new_attr = new XMLNode();
           new_attr.value_type = 3;
           new_attr.vref = s.slice( an_sp,  (an_ep + 1) ).toString();
           new_attr.string_value = s.slice( sp,  ep ).toString();
@@ -125,12 +116,12 @@ class XMLParser  {
     }
     return do_break;
   }
-  last() {
+  last () {
     return this.last_finished;
   }
-  getMoreData() {
+  getMoreData () {
   }
-  processData() {
+  processData () {
     if ( this.no_more_data ) {
       if ( typeof(this.onReady) != "undefined" ) {
         if ( typeof(this.last_finished) != "undefined" ) {
@@ -140,7 +131,7 @@ class XMLParser  {
       return;
     }
     if ( this.has_data ) {
-      if ( this.i >= (this.len - 1) ) {
+      if ( this.i >= (this.__len - 1) ) {
         this.inStream.resume()
       } else {
         if ( this.pull() ) {
@@ -148,10 +139,10 @@ class XMLParser  {
             this.total_nodes = this.total_nodes + 1;
             if ( this.onReady.Data((this.last_finished)) ) {
               if ( typeof(this.last_finished.parent) != "undefined" ) {
-                var last = this.last_finished
-                var p = last.parent
-                var idx = p.children.indexOf(last)
-                var removed = p.children.splice(idx, 1).pop()
+                const last = this.last_finished;
+                const p = last.parent;
+                const idx = p.children.indexOf(last);
+                const removed = p.children.splice(idx, 1).pop();
                 delete removed.parent
               }
             }
@@ -162,22 +153,22 @@ class XMLParser  {
       }
     }
   }
-  askMore(cb) {
+  askMore (cb) {
     this.onReady = cb;
     if ( this.has_started == false ) {
       this.has_started = true;
       this.inStream.on('data', (data) => {
         this.inStream.pause()
         this.has_data = true;
-        this.len = data.length;
-        this.total_bytes = this.total_bytes + this.len;
+        this.__len = data.length;
+        this.total_bytes = this.total_bytes + this.__len;
         this.buff = data;
         this.i = 0;
         this.processData();
       });
       this.inStream.on('end', () => {
         this.no_more_data = true;
-        this.len = 0;
+        this.__len = 0;
         this.i = 0;
         if ( typeof(this.onReady) != "undefined" ) {
           this.onReady.Finished(this.last_finished);
@@ -187,128 +178,128 @@ class XMLParser  {
     }
     this.processData();
   }
-  pull() {
-    var s_4 = this.buff
-    var c_4 = 0
-    /** unused:  var next_c = 0   **/ 
-    /** unused:  var fc = 0   **/ 
-    /** unused:  var new_node   **/ 
-    var sp_4 = this.i
-    var ep_4 = this.i
-    var last_i_4 = 0
-    var cc1_4 = 0
-    var cc2_4 = 0
-    if ( this.i >= (this.len - 1) ) {
+  pull () {
+    const s = this.buff;
+    let c = 0;
+    /** unused:  const next_c = 0   **/ 
+    /** unused:  const fc = 0   **/ 
+    /** unused:  let new_node   **/ 
+    let sp = this.i;
+    let ep = this.i;
+    let last_i = 0;
+    let cc1 = 0;
+    let cc2 = 0;
+    if ( this.i >= (this.__len - 1) ) {
       return false;
     }
-    while (this.i < this.len) {
+    while (this.i < this.__len) {
       this.last_finished = this.curr_node;
-      last_i_4 = this.i;
-      if ( this.i >= (this.len - 1) ) {
+      last_i = this.i;
+      if ( this.i >= (this.__len - 1) ) {
         return false;
       }
-      cc1_4 = s_4[this.i];
-      cc2_4 = s_4[(this.i + 1)];
-      if ( cc1_4 == (62) ) {
+      cc1 = s[this.i];
+      cc2 = s[(this.i + 1)];
+      if ( cc1 == (62) ) {
         this.i = this.i + 1;
-        cc1_4 = s_4[this.i];
-        cc2_4 = s_4[(this.i + 1)];
+        cc1 = s[this.i];
+        cc2 = s[(this.i + 1)];
         continue;
       }
-      if ( ((47) == cc1_4) && (cc2_4 == (62)) ) {
+      if ( ((47) == cc1) && (cc2 == (62)) ) {
         this.tag_depth = this.tag_depth - 1;
         this.i = this.i + 2;
         this.last_finished = this.curr_node;
         this.parents.pop();
-        var p_cnt = this.parents.length
+        const p_cnt = this.parents.length;
         if ( 0 == p_cnt ) {
           return false;
         }
-        var last_parent = this.parents[(p_cnt - 1)]
+        const last_parent = this.parents[(p_cnt - 1)];
         this.last_parent_safe = last_parent;
         this.curr_node = last_parent;
         return true;
       }
-      if ( this.i >= this.len ) {
+      if ( this.i >= this.__len ) {
         return false;
       }
-      if ( ((60) == cc1_4) && (cc2_4 == (47)) ) {
+      if ( ((60) == cc1) && (cc2 == (47)) ) {
         this.tag_depth = this.tag_depth - 1;
         this.i = this.i + 2;
-        sp_4 = this.i;
-        ep_4 = this.i;
-        c_4 = s_4[this.i];
-        while (((this.i < this.len) && (c_4 > 32)) && (c_4 != (62))) {
+        sp = this.i;
+        ep = this.i;
+        c = s[this.i];
+        while (((this.i < this.__len) && (c > 32)) && (c != (62))) {
           this.i = 1 + this.i;
-          c_4 = s_4[this.i];
+          c = s[this.i];
         }
-        ep_4 = this.i;
+        ep = this.i;
         this.parents.pop();
-        var p_cnt_8 = this.parents.length
-        if ( 0 == p_cnt_8 ) {
+        const p_cnt_1 = this.parents.length;
+        if ( 0 == p_cnt_1 ) {
           return false;
         }
-        var last_parent_8 = this.parents[(p_cnt_8 - 1)]
+        const last_parent_1 = this.parents[(p_cnt_1 - 1)];
         this.last_finished = this.curr_node;
-        this.last_parent_safe = last_parent_8;
-        this.curr_node = last_parent_8;
+        this.last_parent_safe = last_parent_1;
+        this.curr_node = last_parent_1;
         return true;
       }
-      if ( cc1_4 == (60) ) {
+      if ( cc1 == (60) ) {
         this.i = this.i + 1;
-        sp_4 = this.i;
-        ep_4 = this.i;
-        c_4 = s_4[this.i];
-        while (((this.i < this.len) && (c_4 != (62))) && (((((((c_4 >= 65) && (c_4 <= 90)) || ((c_4 >= 97) && (c_4 <= 122))) || ((c_4 >= 48) && (c_4 <= 57))) || (c_4 == 95)) || (c_4 == 46)) || (c_4 == 64))) {
+        sp = this.i;
+        ep = this.i;
+        c = s[this.i];
+        while (((this.i < this.__len) && (c != (62))) && (((((((c >= 65) && (c <= 90)) || ((c >= 97) && (c <= 122))) || ((c >= 48) && (c <= 57))) || (c == 95)) || (c == 46)) || (c == 64))) {
           this.i = 1 + this.i;
-          c_4 = s_4[this.i];
+          c = s[this.i];
         }
-        ep_4 = this.i;
-        var new_tag = s_4.slice( sp_4,  ep_4 ).toString()
+        ep = this.i;
+        const new_tag = s.slice( sp,  ep ).toString();
         if ( typeof(this.curr_node) === "undefined" ) {
-          var new_rnode = new XMLNode()
+          const new_rnode = new XMLNode();
           new_rnode.vref = new_tag;
           new_rnode.value_type = 1;
           this.rootNode = new_rnode;
           this.parents.push(new_rnode);
           this.curr_node = new_rnode;
         } else {
-          var new_node_10 = new XMLNode()
-          new_node_10.vref = new_tag;
-          new_node_10.value_type = 1;
-          this.curr_node.children.push(new_node_10);
-          this.parents.push(new_node_10);
-          new_node_10.parent = this.curr_node;
-          this.curr_node = new_node_10;
+          const new_node_2 = new XMLNode();
+          new_node_2.vref = new_tag;
+          new_node_2.value_type = 1;
+          this.curr_node.children.push(new_node_2);
+          this.parents.push(new_node_2);
+          new_node_2.parent = this.curr_node;
+          this.curr_node = new_node_2;
         }
-        if ( c_4 == (47) ) {
+        if ( c == (47) ) {
           continue;
         }
         this.parse_attributes();
         continue;
       }
       if ( typeof(this.curr_node) !== "undefined" ) {
-        sp_4 = this.i;
-        ep_4 = this.i;
-        c_4 = s_4[this.i];
-        while ((this.i < this.len) && (c_4 != (60))) {
+        sp = this.i;
+        ep = this.i;
+        c = s[this.i];
+        while ((this.i < this.__len) && (c != (60))) {
           this.i = 1 + this.i;
-          c_4 = s_4[this.i];
+          c = s[this.i];
         }
-        ep_4 = this.i;
-        if ( ep_4 > sp_4 ) {
-          var new_node_15 = new XMLNode()
-          new_node_15.string_value = s_4.slice( sp_4,  ep_4 ).toString();
-          new_node_15.value_type = 2;
-          this.curr_node.children.push(new_node_15);
-          this.last_finished = new_node_15;
+        ep = this.i;
+        if ( ep > sp ) {
+          const new_node_3 = new XMLNode();
+          new_node_3.string_value = s.slice( sp,  ep ).toString();
+          new_node_3.value_type = 2;
+          this.curr_node.children.push(new_node_3);
+          this.last_finished = new_node_3;
           return true;
         }
       }
-      if ( last_i_4 == this.i ) {
+      if ( last_i == this.i ) {
         this.i = 1 + this.i;
       }
-      if ( this.i >= (this.len - 1) ) {
+      if ( this.i >= (this.__len - 1) ) {
         return false;
       }
     }
@@ -317,13 +308,12 @@ class XMLParser  {
   }
 }
 class myDataHandler  extends XMLDataReady {
-  constructor(p ) {
+  constructor(p) {
     super()
-    this.parser;
     this.parser = p;
   }
-  Data(last_node) {
-    var remove_latest = false
+  Data (last_node) {
+    let remove_latest = false;
     switch (last_node.value_type ) { 
       case 1 : 
         console.log("read a new node, removing it... " + last_node.vref)
@@ -338,23 +328,23 @@ class myDataHandler  extends XMLDataReady {
     })
     return remove_latest;
   }
-  Finished(last_node) {
+  Finished (last_node) {
     console.log((("all data was read, total bytes processed = " + this.parser.total_bytes) + ", total nodes = ") + this.parser.total_nodes)
   }
 }
 class streamTester  {
-  constructor( ) {
+  constructor() {
   }
-  read(fileName) {
-    var inS = require('fs').createReadStream(new InputFile(fileName).filename)
-    var parser = new XMLParser(inS)
-    var handler = new myDataHandler(parser)
+  read (fileName) {
+    const inS = require('fs').createReadStream(new InputFile(fileName).filename);
+    const parser = new XMLParser(inS);
+    const handler = new myDataHandler(parser);
     parser.askMore(handler);
   }
 }
 /* static JavaSript main routine */
 function __js_main() {
-  var tester = new streamTester()
+  const tester = new streamTester();
   tester.read("testCode.xml");
 }
 __js_main();

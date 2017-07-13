@@ -12,28 +12,28 @@ class tester {
     while (p.pull()) {
       final XMLNode last = p.last();
       System.out.println(String.valueOf( "-> pulled a new node " + last.vref ) );
-      final XMLNode last_11 = p.last_finished.get();
-      for ( int i = 0; i < last_11.children.size(); i++) {
-        XMLNode ch = last_11.children.get(i);
+      final XMLNode last_1 = p.last_finished.get();
+      for ( int i = 0; i < last_1.children.size(); i++) {
+        XMLNode ch = last_1.children.get(i);
         if ( ch.value_type == 18 ) {
           System.out.println(String.valueOf( "text : " + ch.string_value ) );
         } else {
           System.out.println(String.valueOf( "child : " + ch.vref ) );
         }
       }
-      for ( int i_10 = 0; i_10 < last_11.attrs.size(); i_10++) {
-        XMLNode attr = last_11.attrs.get(i_10);
+      for ( int i_1 = 0; i_1 < last_1.attrs.size(); i_1++) {
+        XMLNode attr = last_1.attrs.get(i_1);
         System.out.println(String.valueOf( (attr.vref + " = ") + attr.string_value ) );
       }
     }
-    final XMLNode last_12 = p.last();
-    System.out.println(String.valueOf( "The children of the last node are " + last_12.vref ) );
-    for ( int i_12 = 0; i_12 < last_12.children.size(); i_12++) {
-      XMLNode ch_8 = last_12.children.get(i_12);
-      if ( ch_8.value_type == 18 ) {
-        System.out.println(String.valueOf( "text : " + ch_8.string_value ) );
+    final XMLNode last_2 = p.last();
+    System.out.println(String.valueOf( "The children of the last node are " + last_2.vref ) );
+    for ( int i_2 = 0; i_2 < last_2.children.size(); i_2++) {
+      XMLNode ch_1 = last_2.children.get(i_2);
+      if ( ch_1.value_type == 18 ) {
+        System.out.println(String.valueOf( "text : " + ch_1.string_value ) );
       } else {
-        System.out.println(String.valueOf( "child : " + ch_8.vref ) );
+        System.out.println(String.valueOf( "child : " + ch_1.vref ) );
       }
     }
     long elapsedTime = System.nanoTime() - startTime;

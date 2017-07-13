@@ -196,7 +196,7 @@ func (this *XMLNode) Set_parent( value *GoNullable)  {
 type XMLParser struct { 
   code *GoNullable
   buff *GoNullable
-  len int64
+  __len int64
   i int64
   parents []*XMLNode
   next *GoNullable /**  unused  **/ 
@@ -211,8 +211,8 @@ type IFACE_XMLParser interface {
   Set_code(value *GoNullable) 
   Get_buff() *GoNullable
   Set_buff(value *GoNullable) 
-  Get_len() int64
-  Set_len(value int64) 
+  Get___len() int64
+  Set___len(value int64) 
   Get_i() int64
   Set_i(value int64) 
   Get_parents() []*XMLNode
@@ -236,7 +236,7 @@ type IFACE_XMLParser interface {
 
 func CreateNew_XMLParser(code_module *SourceCode) *XMLParser {
   me := new(XMLParser)
-  me.len = 0
+  me.__len = 0
   me.i = 0
   me.parents = make([]*XMLNode,0)
   me.tag_depth = 0
@@ -251,7 +251,7 @@ func CreateNew_XMLParser(code_module *SourceCode) *XMLParser {
   me.buff.has_value = true; /* detected as non-optional */
   me.code.value = code_module;
   me.code.has_value = true; /* detected as non-optional */
-  me.len = int64(len((me.buff.value.([]byte)))); 
+  me.__len = int64(len((me.buff.value.([]byte)))); 
   me.i = 0; 
   return me;
 }
@@ -266,14 +266,14 @@ func (this *XMLParser) parse_attributes () bool {
   var cc1 byte = 0;
   var cc2 byte = 0;
   cc1 = s[this.i]; 
-  for this.i < this.len {
+  for this.i < this.__len {
     last_i = this.i; 
-    for (this.i < this.len) && ((s[this.i]) <= 32) {
+    for (this.i < this.__len) && ((s[this.i]) <= 32) {
       this.i = 1 + this.i; 
     }
     cc1 = s[this.i]; 
     cc2 = s[(this.i + 1)]; 
-    if  this.i >= this.len {
+    if  this.i >= this.__len {
       break;
     }
     if  cc1 == (62) {
@@ -286,7 +286,7 @@ func (this *XMLParser) parse_attributes () bool {
     sp = this.i; 
     ep = this.i; 
     c = s[this.i]; 
-    for (this.i < this.len) && ((((((c >= 65) && (c <= 90)) || ((c >= 97) && (c <= 122))) || ((c >= 48) && (c <= 57))) || (c == (95))) || (c == (45))) {
+    for (this.i < this.__len) && ((((((c >= 65) && (c <= 90)) || ((c >= 97) && (c <= 122))) || ((c >= 48) && (c <= 57))) || (c == (95))) || (c == (45))) {
       this.i = 1 + this.i; 
       c = s[this.i]; 
     }
@@ -294,17 +294,17 @@ func (this *XMLParser) parse_attributes () bool {
     var an_sp int64 = sp;
     var an_ep int64 = this.i;
     c = s[this.i]; 
-    for (this.i < this.len) && (c != (61)) {
+    for (this.i < this.__len) && (c != (61)) {
       this.i = 1 + this.i; 
       c = s[this.i]; 
     }
     if  c == (61) {
       this.i = 1 + this.i; 
     }
-    for (this.i < this.len) && ((s[this.i]) <= 32) {
+    for (this.i < this.__len) && ((s[this.i]) <= 32) {
       this.i = 1 + this.i; 
     }
-    if  this.i >= this.len {
+    if  this.i >= this.__len {
       break;
     }
     c = s[this.i]; 
@@ -313,12 +313,12 @@ func (this *XMLParser) parse_attributes () bool {
       sp = this.i; 
       ep = this.i; 
       c = s[this.i]; 
-      for (this.i < this.len) && (c != 34) {
+      for (this.i < this.__len) && (c != 34) {
         this.i = 1 + this.i; 
         c = s[this.i]; 
       }
       ep = this.i; 
-      if  (this.i < this.len) && (ep > sp) {
+      if  (this.i < this.__len) && (ep > sp) {
         var new_attr *XMLNode = CreateNew_XMLNode(this.code.value.(*SourceCode), an_sp, ep);
         new_attr.value_type = 19; 
         new_attr.vref = fmt.Sprintf("%s", s[an_sp:(an_ep + 1)]); 
@@ -337,36 +337,42 @@ func (this *XMLParser) last () *XMLNode {
   return this.last_finished.value.(*XMLNode);
 }
 func (this *XMLParser) pull () bool {
-  var s_4 []byte = this.buff.value.([]byte);
-  var c_4 byte = 0;
+  var s []byte = this.buff.value.([]byte);
+  var c byte = 0;
   /** unused:  next_c*/
   /** unused:  fc*/
   /** unused:  new_node*/
-  var sp_4 int64 = this.i;
-  var ep_4 int64 = this.i;
-  var last_i_4 int64 = 0;
-  var cc1_4 byte = 0;
-  var cc2_4 byte = 0;
-  for this.i < this.len {
+  var sp int64 = this.i;
+  var ep int64 = this.i;
+  var last_i int64 = 0;
+  var cc1 byte = 0;
+  var cc2 byte = 0;
+  for this.i < this.__len {
     this.last_finished.value = this.curr_node.value;
-    this.last_finished.has_value = this.curr_node.has_value; 
-    last_i_4 = this.i; 
-    if  this.i >= (this.len - 1) {
+    this.last_finished.has_value = false; 
+    if this.last_finished.value != nil {
+      this.last_finished.has_value = true
+    }
+    last_i = this.i; 
+    if  this.i >= (this.__len - 1) {
       return false;
     }
-    cc1_4 = s_4[this.i]; 
-    cc2_4 = s_4[(this.i + 1)]; 
-    if  cc1_4 == (62) {
+    cc1 = s[this.i]; 
+    cc2 = s[(this.i + 1)]; 
+    if  cc1 == (62) {
       this.i = this.i + 1; 
-      cc1_4 = s_4[this.i]; 
-      cc2_4 = s_4[(this.i + 1)]; 
+      cc1 = s[this.i]; 
+      cc2 = s[(this.i + 1)]; 
       continue;
     }
-    if  ((47) == cc1_4) && (cc2_4 == (62)) {
+    if  ((47) == cc1) && (cc2 == (62)) {
       this.tag_depth = this.tag_depth - 1; 
       this.i = this.i + 2; 
       this.last_finished.value = this.curr_node.value;
-      this.last_finished.has_value = this.curr_node.has_value; 
+      this.last_finished.has_value = false; 
+      if this.last_finished.value != nil {
+        this.last_finished.has_value = true
+      }
       this.parents = this.parents[:len(this.parents)-1]; 
       var p_cnt int64 = int64(len(this.parents));
       if  0 == p_cnt {
@@ -379,47 +385,50 @@ func (this *XMLParser) pull () bool {
       this.curr_node.has_value = true; /* detected as non-optional */
       return true;
     }
-    if  this.i >= this.len {
+    if  this.i >= this.__len {
       return false;
     }
-    if  ((60) == cc1_4) && (cc2_4 == (47)) {
+    if  ((60) == cc1) && (cc2 == (47)) {
       this.tag_depth = this.tag_depth - 1; 
       this.i = this.i + 2; 
-      sp_4 = this.i; 
-      ep_4 = this.i; 
-      c_4 = s_4[this.i]; 
-      for ((this.i < this.len) && (c_4 > 32)) && (c_4 != (62)) {
+      sp = this.i; 
+      ep = this.i; 
+      c = s[this.i]; 
+      for ((this.i < this.__len) && (c > 32)) && (c != (62)) {
         this.i = 1 + this.i; 
-        c_4 = s_4[this.i]; 
+        c = s[this.i]; 
       }
-      ep_4 = this.i; 
+      ep = this.i; 
       this.parents = this.parents[:len(this.parents)-1]; 
-      var p_cnt_8 int64 = int64(len(this.parents));
-      if  0 == p_cnt_8 {
+      var p_cnt_1 int64 = int64(len(this.parents));
+      if  0 == p_cnt_1 {
         return false;
       }
-      var last_parent_8 *XMLNode = this.parents[(p_cnt_8 - 1)];
+      var last_parent_1 *XMLNode = this.parents[(p_cnt_1 - 1)];
       this.last_finished.value = this.curr_node.value;
-      this.last_finished.has_value = this.curr_node.has_value; 
-      this.last_parent_safe.value = last_parent_8;
+      this.last_finished.has_value = false; 
+      if this.last_finished.value != nil {
+        this.last_finished.has_value = true
+      }
+      this.last_parent_safe.value = last_parent_1;
       this.last_parent_safe.has_value = true; /* detected as non-optional */
-      this.curr_node.value = last_parent_8;
+      this.curr_node.value = last_parent_1;
       this.curr_node.has_value = true; /* detected as non-optional */
       return true;
     }
-    if  cc1_4 == (60) {
+    if  cc1 == (60) {
       this.i = this.i + 1; 
-      sp_4 = this.i; 
-      ep_4 = this.i; 
-      c_4 = s_4[this.i]; 
-      for ((this.i < this.len) && (c_4 != (62))) && (((((((c_4 >= 65) && (c_4 <= 90)) || ((c_4 >= 97) && (c_4 <= 122))) || ((c_4 >= 48) && (c_4 <= 57))) || (c_4 == 95)) || (c_4 == 46)) || (c_4 == 64)) {
+      sp = this.i; 
+      ep = this.i; 
+      c = s[this.i]; 
+      for ((this.i < this.__len) && (c != (62))) && (((((((c >= 65) && (c <= 90)) || ((c >= 97) && (c <= 122))) || ((c >= 48) && (c <= 57))) || (c == 95)) || (c == 46)) || (c == 64)) {
         this.i = 1 + this.i; 
-        c_4 = s_4[this.i]; 
+        c = s[this.i]; 
       }
-      ep_4 = this.i; 
-      var new_tag string = fmt.Sprintf("%s", s_4[sp_4:ep_4]);
+      ep = this.i; 
+      var new_tag string = fmt.Sprintf("%s", s[sp:ep]);
       if  !this.curr_node.has_value  {
-        var new_rnode *XMLNode = CreateNew_XMLNode(this.code.value.(*SourceCode), sp_4, ep_4);
+        var new_rnode *XMLNode = CreateNew_XMLNode(this.code.value.(*SourceCode), sp, ep);
         new_rnode.vref = new_tag; 
         new_rnode.value_type = 17; 
         this.rootNode.value = new_rnode;
@@ -428,47 +437,53 @@ func (this *XMLParser) pull () bool {
         this.curr_node.value = new_rnode;
         this.curr_node.has_value = true; /* detected as non-optional */
       } else {
-        var new_node_10 *XMLNode = CreateNew_XMLNode(this.code.value.(*SourceCode), sp_4, ep_4);
-        new_node_10.vref = new_tag; 
-        new_node_10.value_type = 17; 
-        this.curr_node.value.(*XMLNode).children = append(this.curr_node.value.(*XMLNode).children,new_node_10); 
-        this.parents = append(this.parents,new_node_10); 
-        new_node_10.parent.value = this.curr_node.value;
-        new_node_10.parent.has_value = this.curr_node.has_value; 
-        this.curr_node.value = new_node_10;
+        var new_node_2 *XMLNode = CreateNew_XMLNode(this.code.value.(*SourceCode), sp, ep);
+        new_node_2.vref = new_tag; 
+        new_node_2.value_type = 17; 
+        this.curr_node.value.(*XMLNode).children = append(this.curr_node.value.(*XMLNode).children,new_node_2); 
+        this.parents = append(this.parents,new_node_2); 
+        new_node_2.parent.value = this.curr_node.value;
+        new_node_2.parent.has_value = false; 
+        if new_node_2.parent.value != nil {
+          new_node_2.parent.has_value = true
+        }
+        this.curr_node.value = new_node_2;
         this.curr_node.has_value = true; /* detected as non-optional */
       }
-      if  c_4 == (47) {
+      if  c == (47) {
         continue;
       }
       this.parse_attributes();
       continue;
     }
     if  this.curr_node.has_value {
-      sp_4 = this.i; 
-      ep_4 = this.i; 
-      c_4 = s_4[this.i]; 
-      for (this.i < this.len) && (c_4 != (60)) {
+      sp = this.i; 
+      ep = this.i; 
+      c = s[this.i]; 
+      for (this.i < this.__len) && (c != (60)) {
         this.i = 1 + this.i; 
-        c_4 = s_4[this.i]; 
+        c = s[this.i]; 
       }
-      ep_4 = this.i; 
-      if  ep_4 > sp_4 {
-        var new_node_15 *XMLNode = CreateNew_XMLNode(this.code.value.(*SourceCode), sp_4, ep_4);
-        new_node_15.string_value = fmt.Sprintf("%s", s_4[sp_4:ep_4]); 
-        new_node_15.value_type = 18; 
-        this.curr_node.value.(*XMLNode).children = append(this.curr_node.value.(*XMLNode).children,new_node_15); 
+      ep = this.i; 
+      if  ep > sp {
+        var new_node_3 *XMLNode = CreateNew_XMLNode(this.code.value.(*SourceCode), sp, ep);
+        new_node_3.string_value = fmt.Sprintf("%s", s[sp:ep]); 
+        new_node_3.value_type = 18; 
+        this.curr_node.value.(*XMLNode).children = append(this.curr_node.value.(*XMLNode).children,new_node_3); 
       }
     }
-    if  last_i_4 == this.i {
+    if  last_i == this.i {
       this.i = 1 + this.i; 
     }
-    if  this.i >= (this.len - 1) {
+    if  this.i >= (this.__len - 1) {
       return false;
     }
   }
   this.last_finished.value = this.curr_node.value;
-  this.last_finished.has_value = this.curr_node.has_value; 
+  this.last_finished.has_value = false; 
+  if this.last_finished.value != nil {
+    this.last_finished.has_value = true
+  }
   return true;
 }
 // getter for variable code
@@ -488,12 +503,12 @@ func (this *XMLParser) Set_buff( value *GoNullable)  {
   this.buff = value 
 }
 // getter for variable len
-func (this *XMLParser) Get_len() int64 {
-  return this.len
+func (this *XMLParser) Get___len() int64 {
+  return this.__len
 }
 // setter for variable len
-func (this *XMLParser) Set_len( value int64)  {
-  this.len = value 
+func (this *XMLParser) Set___len( value int64)  {
+  this.__len = value 
 }
 // getter for variable i
 func (this *XMLParser) Get_i() int64 {
@@ -578,31 +593,31 @@ func main() {
     for p.pull() {
       var last *XMLNode = p.last();
       fmt.Println( strings.Join([]string{ "-> pulled a new node ",last.vref }, "") )
-      var last_11 *XMLNode = p.last_finished.value.(*XMLNode);
+      var last_1 *XMLNode = p.last_finished.value.(*XMLNode);
       var i int64 = 0;  
-      for ; i < int64(len(last_11.children)) ; i++ {
-        ch := last_11.children[i];
+      for ; i < int64(len(last_1.children)) ; i++ {
+        ch := last_1.children[i];
         if  ch.value_type == 18 {
           fmt.Println( strings.Join([]string{ "text : ",ch.string_value }, "") )
         } else {
           fmt.Println( strings.Join([]string{ "child : ",ch.vref }, "") )
         }
       }
-      var i_10 int64 = 0;  
-      for ; i_10 < int64(len(last_11.attrs)) ; i_10++ {
-        attr := last_11.attrs[i_10];
+      var i_1 int64 = 0;  
+      for ; i_1 < int64(len(last_1.attrs)) ; i_1++ {
+        attr := last_1.attrs[i_1];
         fmt.Println( strings.Join([]string{ (strings.Join([]string{ attr.vref," = " }, "")),attr.string_value }, "") )
       }
     }
-    var last_12 *XMLNode = p.last();
-    fmt.Println( strings.Join([]string{ "The children of the last node are ",last_12.vref }, "") )
-    var i_12 int64 = 0;  
-    for ; i_12 < int64(len(last_12.children)) ; i_12++ {
-      ch_8 := last_12.children[i_12];
-      if  ch_8.value_type == 18 {
-        fmt.Println( strings.Join([]string{ "text : ",ch_8.string_value }, "") )
+    var last_2 *XMLNode = p.last();
+    fmt.Println( strings.Join([]string{ "The children of the last node are ",last_2.vref }, "") )
+    var i_2 int64 = 0;  
+    for ; i_2 < int64(len(last_2.children)) ; i_2++ {
+      ch_1 := last_2.children[i_2];
+      if  ch_1.value_type == 18 {
+        fmt.Println( strings.Join([]string{ "text : ",ch_1.string_value }, "") )
       } else {
-        fmt.Println( strings.Join([]string{ "child : ",ch_8.vref }, "") )
+        fmt.Println( strings.Join([]string{ "child : ",ch_1.vref }, "") )
       }
     }
     fmt.Println("Time for parsing the code:", time.Since(_start) )

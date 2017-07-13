@@ -9,8 +9,9 @@ class XMLNode;
 class XMLParser;
 class tester;
 
+
 // header definitions
-class SourceCode { 
+class SourceCode : public std::enable_shared_from_this<SourceCode>  { 
   public :
     std::string code;
     int sp     /** note: unused */;
@@ -18,7 +19,7 @@ class SourceCode {
     /* class constructor */ 
     SourceCode( std::string code_str  );
 };
-class XMLNode { 
+class XMLNode : public std::enable_shared_from_this<XMLNode>  { 
   public :
     std::shared_ptr<SourceCode> code;
     int sp;
@@ -35,11 +36,11 @@ class XMLNode {
     /* instance methods */ 
     std::string getString();
 };
-class XMLParser { 
+class XMLParser : public std::enable_shared_from_this<XMLParser>  { 
   public :
     std::shared_ptr<SourceCode> code;
     const char* buff;
-    int len;
+    int __len;
     int i;
     std::vector<std::shared_ptr<XMLNode>> parents;
     std::shared_ptr<XMLNode> next     /** note: unused */;
@@ -55,7 +56,7 @@ class XMLParser {
     std::shared_ptr<XMLNode> last();
     bool pull();
 };
-class tester { 
+class tester : public std::enable_shared_from_this<tester>  { 
   public :
     /* class constructor */ 
     tester( );
@@ -87,12 +88,12 @@ std::string  XMLNode::getString() {
 }
 
 XMLParser::XMLParser( std::shared_ptr<SourceCode> code_module  ) {
-  this->len = 0;
+  this->__len = 0;
   this->i = 0;
   this->tag_depth = 0;
   buff  = code_module->code.c_str();
   code  = code_module;
-  len = strlen( (buff) );
+  __len = strlen( (buff) );
   i = 0;
 }
 
@@ -107,14 +108,14 @@ bool  XMLParser::parse_attributes() {
   char cc1 = 0;
   char cc2 = 0;
   cc1 = s[ i];
-  while (i < len) {
+  while (i < __len) {
     last_i = i;
-    while ((i < len) && ((s[ i]) <= 32)) {
+    while ((i < __len) && ((s[ i]) <= 32)) {
       i = 1 + i;
     }
     cc1 = s[ i];
     cc2 = s[ (i + 1)];
-    if ( i >= len ) {
+    if ( i >= __len ) {
       break;
     }
     if ( cc1 == (62) ) {
@@ -127,7 +128,7 @@ bool  XMLParser::parse_attributes() {
     sp = i;
     ep = i;
     c = s[ i];
-    while ((i < len) && ((((((c >= 65) && (c <= 90)) || ((c >= 97) && (c <= 122))) || ((c >= 48) && (c <= 57))) || (c == (95))) || (c == (45)))) {
+    while ((i < __len) && ((((((c >= 65) && (c <= 90)) || ((c >= 97) && (c <= 122))) || ((c >= 48) && (c <= 57))) || (c == (95))) || (c == (45)))) {
       i = 1 + i;
       c = s[ i];
     }
@@ -135,17 +136,17 @@ bool  XMLParser::parse_attributes() {
     int an_sp = sp;
     int an_ep = i;
     c = s[ i];
-    while ((i < len) && (c != (61))) {
+    while ((i < __len) && (c != (61))) {
       i = 1 + i;
       c = s[ i];
     }
     if ( c == (61) ) {
       i = 1 + i;
     }
-    while ((i < len) && ((s[ i]) <= 32)) {
+    while ((i < __len) && ((s[ i]) <= 32)) {
       i = 1 + i;
     }
-    if ( i >= len ) {
+    if ( i >= __len ) {
       break;
     }
     c = s[ i];
@@ -154,12 +155,12 @@ bool  XMLParser::parse_attributes() {
       sp = i;
       ep = i;
       c = s[ i];
-      while ((i < len) && (c != 34)) {
+      while ((i < __len) && (c != 34)) {
         i = 1 + i;
         c = s[ i];
       }
       ep = i;
-      if ( (i < len) && (ep > sp) ) {
+      if ( (i < __len) && (ep > sp) ) {
         std::shared_ptr<XMLNode> new_attr =  std::make_shared<XMLNode>(code, an_sp, ep);
         new_attr->value_type = 19;
         new_attr->vref = std::string( s + an_sp, (an_ep + 1) - an_sp );
@@ -180,31 +181,31 @@ std::shared_ptr<XMLNode>  XMLParser::last() {
 }
 
 bool  XMLParser::pull() {
-  const char* s_4 = buff;
-  char c_4 = 0;
+  const char* s = buff;
+  char c = 0;
   /** unused:  char next_c = 0   **/ ;
   /** unused:  char fc = 0   **/ ;
   /** unused:  std::shared_ptr<XMLNode> new_node   **/ ;
-  int sp_4 = i;
-  int ep_4 = i;
-  int last_i_4 = 0;
-  char cc1_4 = 0;
-  char cc2_4 = 0;
-  while (i < len) {
+  int sp = i;
+  int ep = i;
+  int last_i = 0;
+  char cc1 = 0;
+  char cc2 = 0;
+  while (i < __len) {
     last_finished  = curr_node;
-    last_i_4 = i;
-    if ( i >= (len - 1) ) {
+    last_i = i;
+    if ( i >= (__len - 1) ) {
       return false;
     }
-    cc1_4 = s_4[ i];
-    cc2_4 = s_4[ (i + 1)];
-    if ( cc1_4 == (62) ) {
+    cc1 = s[ i];
+    cc2 = s[ (i + 1)];
+    if ( cc1 == (62) ) {
       i = i + 1;
-      cc1_4 = s_4[ i];
-      cc2_4 = s_4[ (i + 1)];
+      cc1 = s[ i];
+      cc2 = s[ (i + 1)];
       continue;
     }
-    if ( ((47) == cc1_4) && (cc2_4 == (62)) ) {
+    if ( ((47) == cc1) && (cc2 == (62)) ) {
       tag_depth = tag_depth - 1;
       i = i + 2;
       last_finished  = curr_node;
@@ -218,84 +219,84 @@ bool  XMLParser::pull() {
       curr_node  = last_parent;
       return true;
     }
-    if ( i >= len ) {
+    if ( i >= __len ) {
       return false;
     }
-    if ( ((60) == cc1_4) && (cc2_4 == (47)) ) {
+    if ( ((60) == cc1) && (cc2 == (47)) ) {
       tag_depth = tag_depth - 1;
       i = i + 2;
-      sp_4 = i;
-      ep_4 = i;
-      c_4 = s_4[ i];
-      while (((i < len) && (c_4 > 32)) && (c_4 != (62))) {
+      sp = i;
+      ep = i;
+      c = s[ i];
+      while (((i < __len) && (c > 32)) && (c != (62))) {
         i = 1 + i;
-        c_4 = s_4[ i];
+        c = s[ i];
       }
-      ep_4 = i;
+      ep = i;
       parents.pop_back();
-      int p_cnt_8 = parents.size();
-      if ( 0 == p_cnt_8 ) {
+      int p_cnt_1 = parents.size();
+      if ( 0 == p_cnt_1 ) {
         return false;
       }
-      std::shared_ptr<XMLNode> last_parent_8 = parents.at( (p_cnt_8 - 1));
+      std::shared_ptr<XMLNode> last_parent_1 = parents.at( (p_cnt_1 - 1));
       last_finished  = curr_node;
-      last_parent_safe  = last_parent_8;
-      curr_node  = last_parent_8;
+      last_parent_safe  = last_parent_1;
+      curr_node  = last_parent_1;
       return true;
     }
-    if ( cc1_4 == (60) ) {
+    if ( cc1 == (60) ) {
       i = i + 1;
-      sp_4 = i;
-      ep_4 = i;
-      c_4 = s_4[ i];
-      while (((i < len) && (c_4 != (62))) && (((((((c_4 >= 65) && (c_4 <= 90)) || ((c_4 >= 97) && (c_4 <= 122))) || ((c_4 >= 48) && (c_4 <= 57))) || (c_4 == 95)) || (c_4 == 46)) || (c_4 == 64))) {
+      sp = i;
+      ep = i;
+      c = s[ i];
+      while (((i < __len) && (c != (62))) && (((((((c >= 65) && (c <= 90)) || ((c >= 97) && (c <= 122))) || ((c >= 48) && (c <= 57))) || (c == 95)) || (c == 46)) || (c == 64))) {
         i = 1 + i;
-        c_4 = s_4[ i];
+        c = s[ i];
       }
-      ep_4 = i;
-      std::string new_tag = std::string( s_4 + sp_4, ep_4 - sp_4 );
+      ep = i;
+      std::string new_tag = std::string( s + sp, ep - sp );
       if ( curr_node == NULL ) {
-        std::shared_ptr<XMLNode> new_rnode =  std::make_shared<XMLNode>(code, sp_4, ep_4);
+        std::shared_ptr<XMLNode> new_rnode =  std::make_shared<XMLNode>(code, sp, ep);
         new_rnode->vref = new_tag;
         new_rnode->value_type = 17;
         rootNode  = new_rnode;
         parents.push_back( new_rnode  );
         curr_node  = new_rnode;
       } else {
-        std::shared_ptr<XMLNode> new_node_10 =  std::make_shared<XMLNode>(code, sp_4, ep_4);
-        new_node_10->vref = new_tag;
-        new_node_10->value_type = 17;
-        curr_node->children.push_back( new_node_10  );
-        parents.push_back( new_node_10  );
-        new_node_10->parent  = curr_node;
-        curr_node  = new_node_10;
+        std::shared_ptr<XMLNode> new_node_2 =  std::make_shared<XMLNode>(code, sp, ep);
+        new_node_2->vref = new_tag;
+        new_node_2->value_type = 17;
+        curr_node->children.push_back( new_node_2  );
+        parents.push_back( new_node_2  );
+        new_node_2->parent  = curr_node;
+        curr_node  = new_node_2;
       }
-      if ( c_4 == (47) ) {
+      if ( c == (47) ) {
         continue;
       }
       this->parse_attributes();
       continue;
     }
     if ( curr_node != NULL  ) {
-      sp_4 = i;
-      ep_4 = i;
-      c_4 = s_4[ i];
-      while ((i < len) && (c_4 != (60))) {
+      sp = i;
+      ep = i;
+      c = s[ i];
+      while ((i < __len) && (c != (60))) {
         i = 1 + i;
-        c_4 = s_4[ i];
+        c = s[ i];
       }
-      ep_4 = i;
-      if ( ep_4 > sp_4 ) {
-        std::shared_ptr<XMLNode> new_node_15 =  std::make_shared<XMLNode>(code, sp_4, ep_4);
-        new_node_15->string_value = std::string( s_4 + sp_4, ep_4 - sp_4 );
-        new_node_15->value_type = 18;
-        curr_node->children.push_back( new_node_15  );
+      ep = i;
+      if ( ep > sp ) {
+        std::shared_ptr<XMLNode> new_node_3 =  std::make_shared<XMLNode>(code, sp, ep);
+        new_node_3->string_value = std::string( s + sp, ep - sp );
+        new_node_3->value_type = 18;
+        curr_node->children.push_back( new_node_3  );
       }
     }
-    if ( last_i_4 == i ) {
+    if ( last_i == i ) {
       i = 1 + i;
     }
-    if ( i >= (len - 1) ) {
+    if ( i >= (__len - 1) ) {
       return false;
     }
   }
@@ -315,28 +316,28 @@ int main(int argc, char* argv[]) {
   while (p->pull()) {
     std::shared_ptr<XMLNode> last = p->last();
     std::cout << std::string("-> pulled a new node ") + last->vref << std::endl;
-    std::shared_ptr<XMLNode> last_11 = p->last_finished;
-    for ( std::vector< std::shared_ptr<XMLNode>>::size_type i = 0; i != last_11->children.size(); i++) {
-      std::shared_ptr<XMLNode> ch = last_11->children.at(i);
+    std::shared_ptr<XMLNode> last_1 = p->last_finished;
+    for ( std::vector< std::shared_ptr<XMLNode>>::size_type i = 0; i != last_1->children.size(); i++) {
+      std::shared_ptr<XMLNode> ch = last_1->children.at(i);
       if ( ch->value_type == 18 ) {
         std::cout << std::string("text : ") + ch->string_value << std::endl;
       } else {
         std::cout << std::string("child : ") + ch->vref << std::endl;
       }
     }
-    for ( std::vector< std::shared_ptr<XMLNode>>::size_type i_10 = 0; i_10 != last_11->attrs.size(); i_10++) {
-      std::shared_ptr<XMLNode> attr = last_11->attrs.at(i_10);
+    for ( std::vector< std::shared_ptr<XMLNode>>::size_type i_1 = 0; i_1 != last_1->attrs.size(); i_1++) {
+      std::shared_ptr<XMLNode> attr = last_1->attrs.at(i_1);
       std::cout << (attr->vref + std::string(" = ")) + attr->string_value << std::endl;
     }
   }
-  std::shared_ptr<XMLNode> last_12 = p->last();
-  std::cout << std::string("The children of the last node are ") + last_12->vref << std::endl;
-  for ( std::vector< std::shared_ptr<XMLNode>>::size_type i_12 = 0; i_12 != last_12->children.size(); i_12++) {
-    std::shared_ptr<XMLNode> ch_8 = last_12->children.at(i_12);
-    if ( ch_8->value_type == 18 ) {
-      std::cout << std::string("text : ") + ch_8->string_value << std::endl;
+  std::shared_ptr<XMLNode> last_2 = p->last();
+  std::cout << std::string("The children of the last node are ") + last_2->vref << std::endl;
+  for ( std::vector< std::shared_ptr<XMLNode>>::size_type i_2 = 0; i_2 != last_2->children.size(); i_2++) {
+    std::shared_ptr<XMLNode> ch_1 = last_2->children.at(i_2);
+    if ( ch_1->value_type == 18 ) {
+      std::cout << std::string("text : ") + ch_1->string_value << std::endl;
     } else {
-      std::cout << std::string("child : ") + ch_8->vref << std::endl;
+      std::cout << std::string("child : ") + ch_1->vref << std::endl;
     }
   }
   std::clock_t __end = std::clock();

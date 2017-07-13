@@ -23,8 +23,68 @@ language {
 
     toplevel_keywords (class systemclass Constructor fn sfn Import Extend Enum def let operators)
     annotation_keywors (weak strong lives temp)
+    
+    ; transformations for the reserved words for function names or other keywords
+    reserved_words {
+        map FnMap
+        forEach forEachItem
+    }
 
     commands {
+
+        M_PI mathPi:double () {
+            templates {
+                es6 ("Math.PI")
+                go ( "math.Pi" (imp "math"))                                
+                swift3 ( "Double.pi" (imp "Foundation"))   
+                java7 ( "Math.PI" (imp "java.lang.Math"))         
+                php ("pi()")        
+                cpp ("M_PI" (imp "<math.h>"))               
+            }
+        }
+
+        fabs fabs:double ( v:double ) {
+            templates {
+                es6 ("Math.abs(" (e 1) ")")
+                go ( "math.Abs(" (e 1) ")" (imp "math"))                                
+                swift3 ( "abs(" (e 1) ")" (imp "Foundation"))   
+                java7 ( "Math.abs(" (e 1) ")" (imp "java.lang.Math"))       
+                php ( "abs(" (e 1) ")")      
+                cpp ("fabs(" (e 1) ")" (imp "<cmath>"))                       
+            }
+        }
+        tan tan:double ( v:double ) {
+            templates {
+                es6 ("Math.tan(" (e 1) ")")
+                go ( "math.Tan(" (e 1) ")" (imp "math"))                                
+                swift3 ( "tan(" (e 1) ")" (imp "Foundation"))   
+                java7 ( "Math.tan(" (e 1) ")" (imp "java.lang.Math"))     
+                php ( "tan(" (e 1) ")")     
+                cpp ("tan(" (e 1) ")" (imp "<math.h>"))                          
+            }
+        }
+
+        golang_wait waiter:void (seconds:double ) {
+            templates {
+                go ( "time.Sleep(time.Duration(" (e 1) " * float64(time.Second) )) " (imp "time") )
+                * ()
+            }
+        }
+
+        wait cmdWait:void ( seconds:double ) {
+            templates {
+                es6 ( "" )
+                * ()
+            }
+        }
+
+        wait cmdWait:void ( seconds:double after:block) {
+            templates {
+                es6 ( "setTimeout( () => { " nl I (block 2) i nl " }, 1000 * " (e 1) ")" )
+                go ( "go func() {" nl I "time.Sleep(time.Duration(" (e 1) " * float64(time.Second) )) " nl (block 2) i nl "}()" nl (imp "time") )
+            }
+        }
+        
 
         ; Profiling
         timer           cmdTimerBlock:void (name:string code:block) {
@@ -54,9 +114,11 @@ language {
         ; Command line arguments
         shell_arg             cmdArg:string (index:int) {
             templates {
+                cpp ( "std::string(argv[" (e 1) "])")
                 php ( "$argv[" (e 1) " + 1]" )
                 java7 ( "args[" (e 1) "]")
                 go ( "os.Args[" (e 1) " + 1]"  (imp "os"))
+                swift3 ("CommandLine.arguments[" (e 1) " + 1]")
                 es6 ( "process.argv[ 2 + process.execArgv.length + " (e 1) "]")
                 ranger ("( shell_arg " (e 1) " )")
             }
@@ -64,6 +126,8 @@ language {
 
         shell_arg_cnt         cmdArg:int () {
             templates {
+                cpp ( "argc")
+                swift3 ("CommandLine.arguments.count")
                 php ( "(count($argv) - 1)" )
                 java7 ( "args.length")
                 go ( "int64( len( os.Args) - 1 )"  (imp "os"))
@@ -91,6 +155,32 @@ language {
 
         file_exists          cmdIsDir:boolean (path:string filename:string) {
             templates {
+                cpp ( "r_cpp_file_exists( " (e 1) " + \"/\" + " (e 2) ")" (imp "<sys/stat.h>") (imp "<string>")
+(create_polyfill "
+bool r_cpp_file_exists(std::string name) 
+{
+  struct stat buffer;
+  return (stat (name.c_str(), &buffer) == 0);
+}    
+    ") )
+                swift3 ( "r_file_exists(fileName:" (e 1) ")" 
+
+(create_polyfill "
+func r_file_exists ( fileName:String ) -> Bool {
+    let fileManager = FileManager.default
+    var isDir : ObjCBool = false
+    if fileManager.fileExists(atPath: fileName, isDirectory:&isDir) {
+        if isDir.boolValue {
+            return false
+        } else {
+            return true
+        }
+    } else {
+        return false
+    }    
+}
+    ")                    
+                )
                 es6 ("require(\"fs\").existsSync(process.cwd() + \"/\" + " (e 1) " + \"/\" + " (e 2) " )")
                 ranger ("( file_exists " (e 1) " + \"/\" + " (e 2) "  )")
                 java7 ( "new File(" (e 1) " + '/' + " (e 2) ").exists()" (imp "java.io.File") )
@@ -112,6 +202,32 @@ func r_file_exists(pathName string, fileName string) bool {
 
         dir_exists          cmdIsDir:boolean (path:string) {
             templates {
+                swift3 ( "r_dir_exists( dirName: " (e 1) ")" 
+
+(create_polyfill "
+func r_dir_exists ( dirName:String ) -> Bool {
+    let fileManager = FileManager.default
+    var isDir : ObjCBool = false
+    if fileManager.fileExists(atPath: dirName, isDirectory:&isDir) {
+        if isDir.boolValue {
+            return true
+        } else {
+            return false
+        }
+    } else {
+        return false
+    }    
+}
+    ")                    
+                )
+                cpp ( "r_cpp_dir_exists( " (e 1) " + \"/\" + " (e 2) ")" (imp "<sys/stat.h>") (imp "<string>")
+(create_polyfill "
+bool  r_cpp_dir_exists(std::string name) 
+{
+  struct stat buffer;
+  return (stat (name.c_str(), &buffer) == 0);
+}    
+    ") )                 
                 java7 ( "new File(" (e 1) ").exists()" (imp "java.io.File") )
                 es6 ("require(\"fs\").existsSync(process.cwd() + \"/\" + " 
                         (e 1) " + \"/\" " (e 2) ")")
@@ -134,6 +250,15 @@ func r_dir_exists(pathName string) bool {
 
         create_dir          cmdCreateDir:void (path:string) {
             templates {
+
+                cpp ( "r_cpp_create_dir( " (e 1) " + \"/\" + " (e 2) ")" (imp "<sys/stat.h>") (imp "<sys/types.h>") (imp "<string>")
+(create_polyfill "
+std::string  r_cpp_create_dir(std::string name) 
+{
+  mkdir( name.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH );
+}    
+    ") )
+                swift3 ( nl )        
                 php (  nl "mkdir(" (e 1) ");" nl )
                 es6 ("require(\"fs\").mkdirSync(process.cwd() + \"/\" + " 
                         (e 1) ")")
@@ -161,6 +286,8 @@ static void createDir(String path)
 
         write_file          cmdWriteFile:void (path:string file:string data:string) {
             templates {
+                swift3 ( nl )   
+                cpp ( nl "/* write file not yet implemented */" nl)
                 ranger ( nl "write_file " (e 1) " " (e 2) " " (e 3) nl)
                 es6 ("require(\"fs\").writeFileSync(process.cwd() + \"/\" + " 
                         (e 1) " + \"/\"  + " (e 2) ", " (e 3) ")")
@@ -293,7 +420,9 @@ func r_io_read_file( path string , fileName string ) *GoNullable {
             templates { 
                 ranger ( nl (e 1) " = " (e 2) nl ) 
                 scala ( nl (e 1) " = " (e 2) nl )      
-                go ( nl (goset 1) ".value = " (e 2) ".value;" nl nl (goset 1) ".has_value = " (e 2) ".has_value; " nl )  
+                go ( nl (goset 1) ".value = " (e 2) ".value;" nl nl (goset 1) ".has_value = false; " nl 
+                    "if " (goset 1) ".value != nil {" nl I (goset 1) ".has_value = true" nl i "}" nl
+                    )  
                 cpp ( nl ( e 1) "  = " (e 2) ";" nl )   
                 java7 ( nl (e 1) " = " (e 2) ";" nl   (imp "java.util.Optional") )        
                 * ( nl (e 1) " = " (e 2) ";" nl ) 
@@ -343,7 +472,16 @@ func r_io_read_file( path string , fileName string ) *GoNullable {
                 * ( (e 1) )
             }
         }        
-
+        unwrap       cmdUnwrap:int        ( arg@(optional):int ) {
+            templates {
+                cpp ( (e 1) ".value" )
+            }
+        } 
+        unwrap       cmdUnwrap:double        ( arg@(optional):double ) {
+            templates {
+                cpp ( (e 1) ".value" )
+            }
+        }        
 
         unwrap       cmdUnwrap:T        ( arg@(optional):T ) {
             templates {
@@ -673,6 +811,18 @@ func r_io_read_file( path string , fileName string ) *GoNullable {
             }
         }
 
+        if              cmdIf:void              ( condition@(optional):int then_block:block )  {
+            templates {
+                cpp ( "if ( " (e 1) ".has_value ) {" nl I (block 2) i nl "}" nl )
+            }
+        }  
+
+        if              cmdIf:void              ( condition@(optional):double then_block:block )  {
+            templates {
+                cpp ( "if ( " (e 1) ".has_value ) {" nl I (block 2) i nl "}" nl )
+            }
+        }        
+
         if              cmdIf:void              ( condition@(optional):T then_block:block )  {
             templates {
                 ranger ( "if ( " (e 1) ") ) {" I nl (block 2) i nl "} {" nl I (block 3) i "}" nl)
@@ -708,8 +858,38 @@ func r_io_read_file( path string , fileName string ) *GoNullable {
             }
         }
 
+        switch          cmdSwitch:void          ( condition:int case_list:block )  {
+            templates {
+                scala ( (e 1) " match { " I (block 2) i "}" )
+                kotlin ( "when (" (e 1) ") { " I (block 2) i "}" )
+                * ( "switch (" (e 1) " ) { " I (block 2) i "}" )
+            }
+        }       
+
+        case        cmdCase:void          (  condition:int case_block:block )  {
+            templates {
+                ranger ( nl "case " (e 1)" { " nl I (block 2) i nl "}" )
+                scala ( nl "case " (e 1)" => " nl I (block 2) nl i )
+                swift3 ( nl "case " (e 1)" : " nl I (block 2) nl i )
+                java7 ( nl "case " (e 1)" : " nl I (java_case 2) nl i )
+                go ( nl "case " (e 1)" : " nl I (block 2) nl i )
+                kotlin ( nl (e 1) " -> {" nl I (block 2) nl i "}" )
+                * ( nl "case " (e 1)" : " nl I (block 2) nl "break;" i )
+            }
+        }      
+
+        switch          cmdSwitch:void          ( condition:string case_list:block )  {
+            templates {
+                cpp ( (custom _) )                                
+                scala ( (e 1) " match { " I (block 2) i "}" )
+                kotlin ( "when (" (e 1) ") { " I (block 2) i "}" )
+                * ( "switch (" (e 1) " ) { " I (block 2) i "}" )
+            }
+        }             
+
         switch          cmdSwitch:void          ( condition:T case_list:block )  {
             templates {
+
                 scala ( (e 1) " match { " I (block 2) i "}" )
                 kotlin ( "when (" (e 1) ") { " I (block 2) i "}" )
                 * ( "switch (" (e 1) " ) { " I (block 2) i "}" )
@@ -798,10 +978,6 @@ func r_io_read_file( path string , fileName string ) *GoNullable {
                 * ( "while (" (e 1) ") {" nl I (block 2) i nl "}" )
             }
         }
-
-
-
-
         []         cmdArrayLiteral:[T] ( typeDef@(ignore):T listOf:expression ) {
             templates {
                 ranger ( "([] _:" (typeof 1) "(" (list 2) "))")
@@ -811,6 +987,16 @@ func r_io_read_file( path string , fileName string ) *GoNullable {
                 * ( "[" (comma 2) "]")
             }
         }
+        null?       cmdIsNotNull:boolean        ( arg@(optional):int ) {
+            templates {
+                cpp ((e 1) ".has_value == false")     
+            }
+        }  
+        null?       cmdIsNotNull:boolean        ( arg@(optional):double ) {
+            templates {
+                cpp ((e 1) ".has_value == false")     
+            }
+        }               
 
         null?       cmdIsNull:boolean        ( arg@(optional):T ) {
             templates {
@@ -826,7 +1012,17 @@ func r_io_read_file( path string , fileName string ) *GoNullable {
                 es6 (  "typeof(" ( e 1 ) ") === \"undefined\"")
                 * ((e 1) "== null")
             }
-        }        
+        }   
+        !null?       cmdIsNotNull:boolean        ( arg@(optional):int ) {
+            templates {
+                cpp ((e 1) ".has_value")     
+            }
+        }  
+        !null?       cmdIsNotNull:boolean        ( arg@(optional):double ) {
+            templates {
+                cpp ((e 1) ".has_value")     
+            }
+        }               
 
         !null?       cmdIsNotNull:boolean        ( arg@(optional):T ) {
             templates {
@@ -857,11 +1053,12 @@ func r_io_read_file( path string , fileName string ) *GoNullable {
                 php ( nl "try {" nl I (block 1) i nl "} catch( Exception $e) {" nl I (block 2) i nl "}" nl )               
                 scala ( nl "try {" nl I (block 1) i nl "} catch {" nl I nl "case e: Exception => {" nl I (block 2) i nl "}" i nl "}" nl )
                 java7 ( nl "try {" nl I (block 1) i nl "} catch( Exception e) {" nl I (block 2) i nl "}" nl )
-
                 go ( nl (block 1) nl )
+                swift3 ( nl "do {" nl I (block 1) i nl "} catch {" nl I (block 2) i nl "}" nl )
                 * ( nl "try {" nl I (block 1) i nl "} catch(e) {" nl I (block 2) i nl "}" nl )
             }
         }
+
 
         ; T.name is a bit of a problem ??        
         for             cmdFor@(newcontext):void          ( list:[T] item@(define):T indexName@(define ignore):int repeat_block:block)  {
@@ -870,8 +1067,20 @@ func r_io_read_file( path string , fileName string ) *GoNullable {
                 swift3 ( (forkctx _ ) (def 2) (def 3) nl "for ( " (swift_rc 3) " , " (e 2) " ) in " (e 1) ".enumerated() {" nl I (block 4) nl i "}" )
                 kotlin ( (forkctx _ ) (def 2) (def 3) "for ( " (e 3) " in " (e 1) ".indices ) {" nl I "val " (e 2) " = " (e 1) "[" (e 3) "]" nl (block 4) nl i "}" )
 
-                rust ( (forkctx _ ) (def 2) (def 3) "for (" (e 3) ", " (e 2) " ) in " (e 1) ".enumerate() {" nl I (block 4) nl i "}" )              
+                rust ( (forkctx _ ) (def 2) (def 3) "for (" (e 3) ", " (e 2) " ) in " (e 1) ".enumerate() {" nl I (block 4) nl i "}" )     
 
+                ; idea of go for macro implementation, not working yet...         
+                go_idea  @macro(true) (nl 
+                "def cnt:int 0" nl
+                "def " (e 3) ":int -1" nl
+                "while (cnt < (array_length " (e 1) ")) {" nl I
+                    (e 3) " =  " (e 3) " + 1" nl
+                    " cnt =  cnt + 1" nl
+                    "def " (e 2) ":" (typeof 2) " (itemAt " (e 1) " (cnt - 1) );" nl     
+                    (block 4) nl
+                    i
+                "}" nl
+                )
                 go    (  (def 2) (def 3) "var " (e 3) " int64 = 0;  " nl "for ; " (e 3) " < int64(len(" (e 1) ")) ; " (e 3) "++ {" nl I nl (e 2) " := " (e 1) "[" (e 3) "];" nl (block 4) nl i "}" )
 
                 php    ( (forkctx _ ) (def 2) (def 3) "for ( " (e 3) " = 0; " (e 3) " < count(" (e 1) "); " (e 3) "++) {" nl I (e 2) " = " (e 1) "[" (e 3) "];" nl (block 4) nl i "}" )
@@ -890,16 +1099,42 @@ func r_io_read_file( path string , fileName string ) *GoNullable {
                 )      
                 cpp ( (forkctx _ ) (def 2) (def 3) "for ( std::vector< " (typeof 2) ">::size_type " (e 3) " = 0; " (e 3) " != " (e 1) ".size(); " (e 3) "++) {" nl 
                             I (typeof 2) " " (e 2) " = " (e 1) ".at(" (e 3) ");" nl (block 4) nl i "}" )          
-                * ( (forkctx _ ) (def 2) (def 3) "for ( var " (e 3) " = 0; " (e 3) " < " (e 1) ".length; " (e 3) "++) {" nl I "var " (e 2) " = " (e 1) "[" (e 3) "];" nl (block 4) nl i "}" )
+                * ( (forkctx _ ) (def 2) (def 3) "for ( let " (e 3) " = 0; " (e 3) " < " (e 1) ".length; " (e 3) "++) {" nl I "var " (e 2) " = " (e 1) "[" (e 3) "];" nl (block 4) nl i "}" )
             }
         }
+
+        for             cmdFor@(newcontext):void          ( hash:[string:T] item@(define):T itemName@(define ignore):string repeat_block:block)  {
+            templates {
+                es6 ("for( var " (e 3) " in " (e 1) ") {" nl I "if(" (e 1) ".hasOwnProperty(" (e 3) ")) {" 
+                        nl I "var " (e 2) " = " (e 1) "[" (e 3) "] " nl (block 4) 
+                        nl i "} }"
+                     )
+            }
+        }    
+
+        for             cmdFor@(newcontext):void          ( hash:[string:T] itemName@(define ignore):string repeat_block:block)  {
+            templates {
+                es6 ("for( var " (e 2) " in " (e 1) ") {" nl I "if(" (e 1) ".hasOwnProperty(" (e 2) ")) {" 
+                        nl I (block 3) 
+                        nl i "} " nl i "}"
+                     )
+            }
+        }              
 
         trim             cmdTrim:string          ( value:string ) { 
             templates {
                 ranger ( "(trim " (e 1 ) ")")                
                 swift3 ( (e 1 ) ".trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)" (imp "Foundation"))                
                 php ( "trim(" (e 1 ) ")")
-                cpp ( "boost::trim_right(" (e 1) ")" (imp "<boost/algorithm/string.hpp>"))
+                cpp ( "r_cpp_trim( " (e 1) ")" (imp "<cctype>") (imp "<string>") (imp "<algorithm>")
+(create_polyfill "
+inline std::string  r_cpp_trim(std::string &s) 
+{
+   auto wsfront=std::find_if_not(s.begin(),s.end(),[](int c){return std::isspace(c);});
+   auto wsback=std::find_if_not(s.rbegin(),s.rend(),[](int c){return std::isspace(c);}).base();
+   return (wsback<=wsfront ? std::string() : std::string(wsfront,wsback));
+}    
+    ") )  
                 scala ( (e 1) ".trim" )
                 csharp ( (e 1) ".Trim()" (imp "System"))
                 go ("strings.TrimSpace(" (e 1) ")" (imp "strings"))
@@ -961,7 +1196,7 @@ func r_io_read_file( path string , fileName string ) *GoNullable {
                 swift3 ( "String(data: Data(bytes:" (e 1) "[" (e 2) " ..< " (e 3) "]), encoding: .utf8)!"  (imp "Foundation"))
                 kotlin ( "String(" (e 1) "," (e 2) ", " (e 3) " - " (e 2) " )")           
                 go ( "fmt.Sprintf(\"%s\", " (e 1) "[" (e 2) ":" (e 3) "])"               
-                
+                 (imp "fmt")
                 )
                 cpp ( "std::string( " (e 1) " + " (e 2) ", " (e 3) " - " (e 2) " )")
                 php ( "substr(" (e 1) ", " (e 2) ", " (e 3) " - " (e 2) ")") 
@@ -1000,6 +1235,22 @@ func r_io_read_file( path string , fileName string ) *GoNullable {
             }
         }
 
+        to_int      cmdToInt:int       ( value:double ) { 
+            templates {
+                ranger ( "(to_int " (e 1) ")") 
+                csharp ( "(int)" (e 1 ) "" )
+                swift3 ( "Int(" (e 1 ) ")" )
+                kotlin ( (e 1 ) ".toInt()" )
+                scala ( (e 1 ) ".toInt" )
+                rust ( (e 1 ) " as i64 " )
+                go ( "int64(" (e 1) ")")
+                php ( "floor(" (e 1) ")")
+                java7 ( "Double.valueOf(" (e 1) ").intValue()")
+                cpp ( "floor( " (e 1) ")" (imp "<math.h>"))
+                * ( "Math.floor( " (e 1) ")" )
+            }
+        }        
+
         to_int      cmdToInt:int       ( ch:char ) { 
             templates {
                 ranger ( "(to_int " (e 1) ")") 
@@ -1013,6 +1264,12 @@ func r_io_read_file( path string , fileName string ) *GoNullable {
                 * ( (e 1) )
             }
         }        
+        
+        to_int cmdToInt@(optional):int (txt:string) {
+            templates {
+                * @macro(true) ("str2int(" (e 1) ")")
+            }
+        }
 
         ; Length
         length      cmdLength:int       ( buffer:charbuffer ) { 
@@ -1041,7 +1298,7 @@ func r_io_read_file( path string , fileName string ) *GoNullable {
                 kotlin ( (e 1) "[" (e 2) "]")    
                 scala ( (e 1) "(" (e 2) ")")    
                 go ( "int64(" (e 1) "[" (e 2) "])")  
-                swift3 ( (e 1) "[" (e 2) "]")    
+                swift3 ( "Int( String( " (e 1) ".characters[" (e 1) ".index(" (e 1) ".startIndex, offsetBy: " (e 2) ")]))!")    
                 * ( (e 1) ".charCodeAt(" (e 2) " )")
             }
         }        
@@ -1078,8 +1335,10 @@ func r_io_read_file( path string , fileName string ) *GoNullable {
             templates {
                 ranger ( "(charcode " (e 1) ")")
                 go ( "[]byte(" (e 1) ")[0]" )
+                cpp( (e 1) ".at(0)")
                 php ( "ord(" (e 1) "[0])") 
                 java7 ( "((" (e 1) ".getBytes())[0])") 
+                swift3 ( "UInt8( String( " (e 1) ".characters[" (e 1) ".startIndex]))! ")  
                 * ( (e 1) ".charCodeAt(0)" )
             }
         }
@@ -1095,7 +1354,7 @@ func r_io_read_file( path string , fileName string ) *GoNullable {
                 ranger ( "(strfromcode " (e 1) ")")
                 csharp ( "((char)" (e 1) ").toString()") 
                 java7 ( "(new String( new char[] {" (e 1) " }))") 
-                swift3 ( "(String( Character( UnicodeScalar(" (e 1) " ))))") 
+                swift3 ( "(String( Character( UnicodeScalar(" (e 1) " ) )))") 
                 php ( "chr(" (e 1) ")") 
                 scala ( "(" (e 1) ".toChar)")      
                 go ("string([] byte{byte(" (e 1) ")})")       
@@ -1109,13 +1368,39 @@ func r_io_read_file( path string , fileName string ) *GoNullable {
                 ranger ( "(strfromcode " (e 1) ")"))
                 csharp ( "((char)" (e 1) ").toString()") 
                 java7 ( "(new String( Character.toChars(" (e 1) ")))") 
-                swift3 ( "(String( Character( UnicodeScalar(" (e 1) " ))))") 
+                swift3 ( "(String( Character( UnicodeScalar(" (e 1) " )! )))") 
                 php ( "chr(" (e 1) ")") 
                 scala ( "(" (e 1) ".toChar)")      
                 go ("string([] byte{byte(" (e 1) ")})")        
                 * ( "String.fromCharCode(" (e 1) ")")
             }
         }
+
+        to_int   cmdDoubleToString:string       ( value:int ) { 
+            templates {
+                ranger ( "(to_int " (e 1) ")")
+                cpp ("std::to_string(" (e 1) ")" imp("<string>"))
+                java7 ( "String.valueOf(" (e 1) " )") 
+                php ( "strval(" (e 1) ")") 
+                scala ( "(" (e 1) ".toString)")
+                go ("strconv.FormatFloat(" (e 1) ",'f', 6, 64)" (imp "strconv"))
+                swfit3 ("String(" (e 1) ")")              
+                * ( "(" (e 1) ".toString())")
+            }
+        }          
+
+        to_string   cmdIntToString:string       ( value:int ) { 
+            templates {
+                ranger ( "(to_string " (e 1) ")")
+                cpp ("std::to_string(" (e 1) ")" imp("<string>"))
+                java7 ( "String.valueOf(" (e 1) " )") 
+                php ( "strval(" (e 1) ")") 
+                scala ( "(" (e 1) ".toString)")
+                go ("strconv.Itoa(" (e 1) ")" (imp "strconv"))
+                swfit3 ("String(" (e 1) ")")              
+                * ( "(" (e 1) ").toString()")
+            }
+        }        
         
         ; std::to_string(myDoubleVar);
         double2str   cmdDoubleToString:string       ( value:double ) { 
@@ -1126,7 +1411,7 @@ func r_io_read_file( path string , fileName string ) *GoNullable {
                 php ( "strval(" (e 1) ")") 
                 scala ( "(" (e 1) ".toString)")
                 go ("strconv.FormatFloat(" (e 1) ",'f', 6, 64)" (imp "strconv"))
-                swfit3 ("String(" (e 1) ")")              
+                swift3 ("String(" (e 1) ")")              
                 * ( "(" (e 1) ".toString())")
             }
         }
@@ -1140,7 +1425,32 @@ func r_io_read_file( path string , fileName string ) *GoNullable {
         str2int   cmdStringToInt@(optional):int      ( value:string ) { 
             templates {
                 ranger ( "(str2int " (e 1) ")")
-                cpp ("std::stoi(" (e 1) ")" imp("<string>"))
+                cpp ("cpp_str_to_int(" (e 1) ")" imp("<string>")
+                
+(create_polyfill
+"
+template <class T>
+class r_optional_primitive {
+  public:
+    bool has_value;
+    T value;
+};
+"
+) 
+(create_polyfill
+"r_optional_primitive<int> cpp_str_to_int(std::string s) {
+    r_optional_primitive<int> result;
+    try {
+        result.value = std::stoi(s);
+        result.has_value = true;
+    } catch (...) {
+        
+    }
+    return result;
+}"
+)                  
+                
+                )
                 java7 ( "Optional.of(Integer.parseInt(" (e 1) " ))") 
                 go ("r_str_2_i64(" (e 1) ")"
 
@@ -1171,9 +1481,34 @@ func r_str_2_i64(s string) *GoNullable {
         str2double   cmdStringToDouble@(optional):double      ( value:string ) { 
             templates {
                 ranger ( "(str2double " (e 1) ")")
-                cpp ("std::stod(" (e 1) ")" imp("<string>"))
+                cpp ("cpp_str_to_double(" (e 1) ")" imp("<string>")
+(create_polyfill
+"
+template <class T>
+class r_optional_primitive {
+  public:
+    bool has_value;
+    T value;
+};
+"
+) 
+(create_polyfill
+"r_optional_primitive<double> cpp_str_to_double(std::string s) {
+    r_optional_primitive<double> result;
+    try {
+        result.value = std::stod(s);
+        result.has_value = true;
+    } catch (...) {
+        
+    }
+    return result;
+}"
+)                  
+                
+                )
                 java7 ( "Optional.of(Double.parseDouble(" (e 1) " ))") 
                 go ("r_str_2_d64(" (e 1) ")"
+                (imp "strconv")
 (create_polyfill
 "func r_str_2_d64(s string) *GoNullable {
    res := new(GoNullable);
@@ -1192,6 +1527,12 @@ func r_str_2_i64(s string) *GoNullable {
                 kotlin (  (e 1) ".toDouble()")
                 swift3 ("Double(" (e 1) ")")              
                 * ( "isNaN( parseFloat(" (e 1) ") ) ? undefined : parseFloat(" (e 1) ")")
+            }
+        }
+
+        to_double cmdToDbl@(optional):double (value:string) {
+            templates {
+                * @macro(true) ("str2double(" (e 1) ")")
             }
         }
         
@@ -1218,6 +1559,8 @@ static String joinStrings(ArrayList<String> list, String delimiter)
                 )
                 go ( "strings.Join(" (e 1) ", " (e 2) ")")
                 scala ( (e 1) ".mkString(" (e 2) ")" )
+                php ( "implode(" (e 2) ", " (e 1) ")")
+                swift3 ( (e 1) ".joined(separator:" (e 2) ")")
                 * ( (e 1) ".join(" (e 2) ")" )
             }            
         }                 
@@ -1226,7 +1569,7 @@ static String joinStrings(ArrayList<String> list, String delimiter)
             templates {                
                 ranger ( "(has " (e 1) " " (e 2) ")") 
                 es5  ( "typeof(" (e 1) "[" (e 2) "] ) != \"undefined\"" )
-                es6  ( "typeof(" (e 1) "[" (e 2) "] ) != \"undefined\"" )
+                es6  ( "( typeof(" (e 1) "[" (e 2) "] ) != \"undefined\" && " (e 1) ".hasOwnProperty(" (e 2) ") )" )
                 ts   ( "typeof(" (e 1) "[" (e 2) "] ) != \"undefined\"" )
                 flow ( "typeof(" (e 1) "[" (e 2) "] ) != \"undefined\"" )
                 cpp ( (e 1) ".count(" (e 2) ")" )
@@ -1325,7 +1668,17 @@ i "}" nl ))
 "}" nl ))  
 
                  )
-
+                 swift3( "r_index_of(arr:" (e 1) ", elem:" (e 2)")"
+(macro ("
+func r_index_of ( arr:" (typeof 1)  " , elem: " (typeof 2) ") -> Int { " nl I
+    "if let idx = arr.index(of: elem) { " nl
+    "    return idx " nl
+    "} else { " nl
+    I "    return -1 " nl i
+    "}  " nl
+    i
+"}" nl ) )                
+                 )
                  * ( (e 1) ".indexOf(" (e 2) ")" )                                              
             }
         }
@@ -1481,6 +1834,11 @@ i "}" nl ))
             templates {
                 ranger ("( to_double " (e 1) " )")
                 go ("float64( " (e 1) " )")
+                es6 ( (e 1) )
+                swift3 ("Double(" (e 1) ")")
+                java7 ("Double.valueOf(" (e 1) ")")
+                cpp ("(double)(" (e 1) ")")
+                php ( (e 1) )
             }
         }
 

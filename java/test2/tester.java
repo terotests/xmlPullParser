@@ -29,9 +29,9 @@ class tester {
     int text_cnt = 0;
     while (p.pull()) {
       /** unused:  final XMLNode last = p.last()   **/ ;
-      final XMLNode last_11 = p.last_finished.get();
-      for ( int i = 0; i < last_11.children.size(); i++) {
-        XMLNode ch = last_11.children.get(i);
+      final XMLNode last_1 = p.last_finished.get();
+      for ( int i = 0; i < last_1.children.size(); i++) {
+        XMLNode ch = last_1.children.get(i);
         if ( ch.value_type == 18 ) {
           node_cnt = node_cnt + 1;
         } else {
@@ -39,8 +39,8 @@ class tester {
         }
       }
     }
-    final XMLNode last_12 = p.last();
-    System.out.println(String.valueOf( "Last node was" + last_12.vref ) );
+    final XMLNode last_2 = p.last();
+    System.out.println(String.valueOf( "Last node was" + last_2.vref ) );
     System.out.println(String.valueOf( ((("Collected " + node_cnt) + " nodes and ") + text_cnt) + " text nodes" ) );
     long elapsedTime = System.nanoTime() - startTime;
     System.out.println( "Time for parsing the code:"+ String.valueOf((double)elapsedTime / 1000000000.0));
